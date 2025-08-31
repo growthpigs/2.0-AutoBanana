@@ -156,4 +156,9 @@ export const EditingTools: React.FC<EditingToolsProps> = ({
       <div className="border-t border-gray-200 mt-6 pt-4 flex items-center justify-between">
          <div>
             <button onClick={onReset} disabled={!canUndo || isLoading} className="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity-50">Reset</button>
-            <button onClick={onUploadNew} disabled={isLoading} className="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity
+            <button onClick={onUploadNew} disabled={isLoading} className="px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-md disabled:opacity-50">Upload New</button>
+         </div>
+      </div>
+   </div>
+ );
+}

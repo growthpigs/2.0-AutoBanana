@@ -1,0 +1,61 @@
+{
+  "name": "CodeRabbit MCP",
+  "description": "AI-powered code review and quality assurance",
+  "enabled": true,
+  "config": {
+    "asyncReview": true,
+    "reportBack": true,
+    "autoFix": false,
+    "reviewTriggers": ["commit", "PR", "manual"],
+    "reviewScope": {
+      "includeTests": true,
+      "checkSecurity": true,
+      "checkPerformance": true,
+      "checkAccessibility": true,
+      "checkBestPractices": true
+    },
+    "rules": {
+      "enforceTypeScript": true,
+      "requireTests": true,
+      "minCoverage": 80,
+      "maxComplexity": 10,
+      "preventHardcodedSecrets": true,
+      "enforceNaming": true
+    },
+    "integrations": {
+      "github": {
+        "enabled": true,
+        "autoComment": true,
+        "blockMergeOnFailure": false,
+        "labeling": true
+      },
+      "slack": {
+        "enabled": false,
+        "channel": "#code-reviews"
+      }
+    },
+    "customChecks": [
+      {
+        "name": "Gemini API Key Check",
+        "pattern": "GEMINI_API_KEY|gemini.*key",
+        "message": "Ensure API keys are in environment variables"
+      },
+      {
+        "name": "Design Rules Compliance",
+        "files": ["*.ts", "*.tsx"],
+        "check": "Verify design rules are enforced in prompts"
+      }
+    ],
+    "reporting": {
+      "format": "markdown",
+      "saveTo": "./test-docs/coderabbit-reports/",
+      "includeMetrics": true,
+      "includeSuggestions": true
+    }
+  },
+  "hooks": {
+    "preCommit": "npm run lint && npm run typecheck",
+    "postReview": "npm run test:coverage",
+    "onFailure": "echo 'CodeRabbit review failed' >> .claude/logs/review.log"
+  }
+}

@@ -1,0 +1,129 @@
+{
+  "name": "Sourcegraph AMP (formerly Cody)",
+  "description": "AI-powered code intelligence, refactoring, and search",
+  "enabled": true,
+  "config": {
+    "codeIntelligence": {
+      "enabled": true,
+      "features": {
+        "semanticSearch": true,
+        "crossRepoNavigation": true,
+        "findReferences": true,
+        "smartRename": true,
+        "typeHierarchy": true
+      }
+    },
+    "refactoring": {
+      "enabled": true,
+      "autoSuggest": true,
+      "safeMode": true,
+      "operations": [
+        "extractFunction",
+        "extractComponent",
+        "inlineVariable",
+        "convertToAsync",
+        "optimizeImports",
+        "removeDeadCode"
+      ],
+      "rules": {
+        "preserveTypes": true,
+        "maintainTests": true,
+        "updateDocumentation": true
+      }
+    },
+    "codeGeneration": {
+      "enabled": true,
+      "templates": {
+        "components": "React functional with TypeScript",
+        "tests": "Vitest with Testing Library",
+        "services": "Singleton pattern with error handling"
+      },
+      "autoComplete": {
+        "enabled": true,
+        "contextLines": 50,
+        "multiLine": true
+      }
+    },
+    "analysis": {
+      "complexity": {
+        "enabled": true,
+        "maxCyclomaticComplexity": 10,
+        "maxCognitiveComplexity": 15
+      },
+      "dependencies": {
+        "checkVulnerabilities": true,
+        "suggestUpdates": true,
+        "trackLicenses": true
+      },
+      "performance": {
+        "detectBottlenecks": true,
+        "suggestOptimizations": true,
+        "memoryLeaks": true
+      }
+    },
+    "search": {
+      "indexing": {
+        "incremental": true,
+        "includeNodeModules": false,
+        "excludePatterns": ["*.log", "dist/*", "build/*"]
+      },
+      "capabilities": {
+        "regex": true,
+        "structural": true,
+        "semantic": true,
+        "fuzzy": true
+      }
+    },
+    "geminiIntegration": {
+      "analyzePrompts": true,
+      "optimizeCalls": true,
+      "suggestImprovements": true,
+      "trackUsage": true
+    },
+    "reporting": {
+      "weekly": true,
+      "metrics": [
+        "codeQuality",
+        "technicalDebt",
+        "testCoverage",
+        "complexity",
+        "dependencies"
+      ],
+      "outputPath": "./test-docs/amp-reports/"
+    }
+  },
+  "workflows": {
+    "preCommit": {
+      "enabled": true,
+      "actions": [
+        "optimizeImports",
+        "removeDeadCode",
+        "formatCode"
+      ]
+    },
+    "codeReview": {
+      "enabled": true,
+      "autoSuggest": true,
+      "explainChanges": true
+    },
+    "refactorAssist": {
+      "enabled": true,
+      "interactive": true,
+      "previewChanges": true
+    }
+  },
+  "integrations": {
+    "vscode": {
+      "enabled": true,
+      "extensions": ["sourcegraph.cody-ai", "sourcegraph.sourcegraph"]
+    },
+    "github": {
+      "enabled": true,
+      "features": ["pr-reviews", "issue-links", "code-navigation"]
+    },
+    "graphite": {
+      "enabled": true,
+      "syncStacks": true
+    }
+  }
+}

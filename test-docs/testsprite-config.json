@@ -1,0 +1,130 @@
+{
+  "name": "TestSprite Configuration",
+  "description": "AI-powered test generation and management",
+  "enabled": true,
+  "config": {
+    "testGeneration": {
+      "framework": "vitest",
+      "style": "testing-library",
+      "coverage": {
+        "target": 80,
+        "branches": true,
+        "functions": true,
+        "lines": true,
+        "statements": true
+      },
+      "types": {
+        "unit": {
+          "enabled": true,
+          "pattern": "*.test.{ts,tsx}",
+          "location": "src/__tests__/unit/"
+        },
+        "integration": {
+          "enabled": true,
+          "pattern": "*.integration.test.{ts,tsx}",
+          "location": "src/__tests__/integration/"
+        },
+        "e2e": {
+          "enabled": true,
+          "framework": "playwright",
+          "pattern": "*.e2e.test.{ts,tsx}",
+          "location": "e2e/"
+        }
+      }
+    },
+    "aiFeatures": {
+      "autoGenerate": {
+        "enabled": true,
+        "onFileChange": true,
+        "onCommit": false,
+        "coverage": true
+      },
+      "testSuggestions": {
+        "enabled": true,
+        "edgeCases": true,
+        "errorScenarios": true,
+        "performanceTests": true
+      },
+      "testMaintenance": {
+        "updateOnCodeChange": true,
+        "removeObsolete": true,
+        "refactorDuplicates": true
+      }
+    },
+    "geminiSpecific": {
+      "mockResponses": {
+        "enabled": true,
+        "location": "test-docs/mocks/gemini/",
+        "scenarios": [
+          "successful_generation",
+          "rate_limit",
+          "safety_block",
+          "network_error",
+          "invalid_api_key"
+        ]
+      },
+      "promptTesting": {
+        "enabled": true,
+        "validatePrompts": true,
+        "testVariations": true,
+        "measureQuality": true
+      }
+    },
+    "testPlans": [
+      {
+        "name": "Image Upload Flow",
+        "type": "e2e",
+        "steps": [
+          "Open application",
+          "Upload product image",
+          "Verify image preview",
+          "Check description generation"
+        ]
+      },
+      {
+        "name": "Ad Generation Flow",
+        "type": "e2e",
+        "steps": [
+          "Select format",
+          "Enter prompt",
+          "Generate ad",
+          "Verify output",
+          "Test edit functionality"
+        ]
+      },
+      {
+        "name": "Error Handling",
+        "type": "integration",
+        "scenarios": [
+          "Invalid API key",
+          "Network failure",
+          "Safety filter triggered",
+          "Rate limiting"
+        ]
+      }
+    ],
+    "reporting": {
+      "format": "html",
+      "location": "test-docs/reports/",
+      "includeScreenshots": true,
+      "includeCoverage": true,
+      "emailOnFailure": false
+    },
+    "cicd": {
+      "runOnPush": true,
+      "runOnPR": true,
+      "blockOnFailure": false,
+      "parallelExecution": true,
+      "retryFailures": 2
+    }
+  },
+  "scripts": {
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:generate": "testsprite generate",
+    "test:update": "testsprite update",
+    "test:report": "testsprite report"
+  }
+}

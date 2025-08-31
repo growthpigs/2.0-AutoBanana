@@ -1,0 +1,107 @@
+{
+  "name": "Adify Graphite Configuration",
+  "description": "Stack-based Git workflow for rapid development",
+  "config": {
+    "stackManagement": {
+      "enabled": true,
+      "autoStack": true,
+      "defaultBranchSize": "small",
+      "submitStrategy": "parallel",
+      "rebaseStrategy": "interactive"
+    },
+    "branchNaming": {
+      "pattern": "{type}/{description}",
+      "types": [
+        "feat",
+        "fix",
+        "refactor",
+        "test",
+        "docs",
+        "style",
+        "perf",
+        "chore"
+      ],
+      "examples": [
+        "feat/add-video-generation",
+        "fix/gemini-api-timeout",
+        "refactor/extract-service-layer",
+        "test/add-e2e-coverage"
+      ]
+    },
+    "pullRequests": {
+      "template": {
+        "title": "[{type}] {description}",
+        "body": "## Summary\n{summary}\n\n## Changes\n{changes}\n\n## Testing\n{testing}\n\n## Screenshots\n{screenshots}"
+      },
+      "autoAssign": true,
+      "requireReviews": true,
+      "squashMerge": true,
+      "deleteAfterMerge": true
+    },
+    "workflow": {
+      "steps": [
+        {
+          "name": "Create stack",
+          "command": "gt stack create",
+          "description": "Start new feature stack"
+        },
+        {
+          "name": "Add changes",
+          "command": "gt add -A",
+          "description": "Stage all changes"
+        },
+        {
+          "name": "Create commit",
+          "command": "gt commit -m \"{message}\"",
+          "description": "Commit with message"
+        },
+        {
+          "name": "Submit stack",
+          "command": "gt submit",
+          "description": "Submit entire stack for review"
+        },
+        {
+          "name": "Update stack",
+          "command": "gt stack update",
+          "description": "Update stack with main branch changes"
+        }
+      ]
+    },
+    "hooks": {
+      "preCommit": [
+        "npm run lint",
+        "npm run typecheck"
+      ],
+      "prePush": [
+        "npm test"
+      ],
+      "postMerge": [
+        "npm install",
+        "gt repo sync"
+      ]
+    },
+    "integrations": {
+      "github": {
+        "enabled": true,
+        "autoLink": true,
+        "stackedPRs": true
+      },
+      "codeRabbit": {
+        "enabled": true,
+        "triggerOnSubmit": true
+      },
+      "sourcegraph": {
+        "enabled": true,
+        "linkNavigation": true
+      }
+    },
+    "aliases": {
+      "s": "status",
+      "c": "commit",
+      "st": "stack",
+      "sub": "submit",
+      "syn": "repo sync",
+      "up": "stack update"
+    }
+  }
+}
