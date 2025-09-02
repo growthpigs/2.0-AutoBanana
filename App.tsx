@@ -14,7 +14,6 @@ import { AnalysisCompleteNotification } from './components/AnalysisCompleteNotif
 import { PlusIcon } from './components/Icons';
 import { AnalysisLoader } from './components/AnalysisLoader';
 import { GenerationLoader } from './components/GenerationLoader';
-import { EditingLoader } from './components/EditingLoader';
 import { GenerationProgress } from './components/GenerationProgress';
 import { AppSkeleton } from './components/SkeletonLoader';
 import { ProductionStatusPanel } from './components/ProductionStatusPanel';
@@ -121,8 +120,7 @@ export const App: React.FC = () => {
         setHistory([]);
         setCurrentHistoryIndex(-1);
         setError(null);
-        // DON'T clear session gallery - keep all generations!
-        // setSessionGallery([]);
+        setSessionGallery([]);
         setLastGenerationParams(null);
         console.log('✅ Image state set successfully');
         
@@ -135,23 +133,18 @@ export const App: React.FC = () => {
             console.log('🧠 Starting automatic smart analysis...');
             setIsAnalyzing(true);
             
-            // Single API call for analysis (includes description generation)
+            // Trigger smart analysis with default values
             const analysisResult = await analyzeProduct(
                 newImage.file, 
                 'Product', // Default title
-                '' // Empty description - analyzeProduct will generate its own
+                'AI-powered product analysis' // Default description
             );
             console.log('📊 Analysis result:', analysisResult);
-            
-            // Use the description from the analysis result
-            const productDescription = analysisResult.userStory || 'Professional product for your marketing needs';
-            console.log('✅ Description from analysis:', productDescription);
-            setImageDescription(productDescription); // Update the state with description
             
             // Update the image with analysis results and smart input
             const analysisSmartInput: SmartProductInput = {
                 title: analysisResult.suggestedTitle,
-                description: productDescription, // Use the description from analysis
+                description: 'AI-powered product analysis',
                 industry: analysisResult.detectedIndustry,
                 targetAudience: analysisResult.recommendedAudiences?.[0] || null,
                 analysis: analysisResult,
@@ -358,6 +351,7 @@ export const App: React.FC = () => {
                 const newContent: MockupContent = { imageUrl: result.imageUrl, slogan };
                 updateHistory(newContent);
                 setSessionGallery(prev => [newContent, ...prev].slice(0, 16));
+                setBannerTab('generations'); // Auto-switch to generations tab
             } catch (e: any) {
                 setError(e.message || 'Failed to generate natural environment mockup.');
                 updateHistory(null);
@@ -392,6 +386,7 @@ export const App: React.FC = () => {
                 const newContent: MockupContent = { imageUrl: result.imageUrl, slogan };
                 updateHistory(newContent);
                 setSessionGallery(prev => [newContent, ...prev].slice(0, 16));
+                setBannerTab('generations'); // Auto-switch to generations tab
             } else if (format.type === 'facebook') {
                 setLoadingState('generating_text');
                 const fbContent = await generateFacebookAdContent(format, description);
@@ -623,8 +618,7 @@ export const App: React.FC = () => {
         setHistory([]);
         setCurrentHistoryIndex(-1);
         setError(null);
-        // Keep session gallery - don't clear generations
-        // setSessionGallery([]);
+        setSessionGallery([]);
         setLastGenerationParams(null);
     };
 
@@ -652,8 +646,7 @@ export const App: React.FC = () => {
             setHistory([]);
             setCurrentHistoryIndex(-1);
             setError(null);
-            // Keep session gallery when switching images
-            // setSessionGallery([]);
+            setSessionGallery([]);
             setLastGenerationParams(null);
         }
     };
@@ -670,8 +663,7 @@ export const App: React.FC = () => {
                 setImageDescription('');
                 setHistory([]);
                 setCurrentHistoryIndex(-1);
-                // Only clear gallery if no images left
-                // setSessionGallery([]);
+                setSessionGallery([]);
                 setLastGenerationParams(null);
             }
         }
@@ -819,9 +811,127 @@ export const App: React.FC = () => {
         <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#fefcf0' }}>
             <Header />
             
-            <main className="flex flex-1 bg-white">
-                <div className="w-[400px] flex flex-col">
-                    <Sidebar
+            {/* Unified Banner with Tab System */}
+            <div className="bg-gray-50 border-b border-gray-200" style={{ height: '140px' }}>
+                <div className="flex h-full">
+                    {/* Tab Headers */}
+                    <div className="flex items-start pt-3 px-4 gap-2">
+                        <button
+                            onClick={() => setBannerTab('uploads')}
+                            className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider rounded-t-lg transition-colors ${
+                                bannerTab === 'uploads'
+                                    ? 'bg-white text-gray-900 border-t border-l border-r border-gray-200'
+                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-50'
+                            }`}
+                        >
+                            UPLOADS
+                        </button>
+                        <button
+                            onClick={() => setBannerTab('generations')}
+                            className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider rounded-t-lg transition-colors ${
+                                bannerTab === 'generations'
+                                    ? 'bg-white text-gray-900 border-t border-l border-r border-gray-200'
+                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-50'
+                            }`}
+                        >
+                            GENERATIONS
+                            {sessionGallery.length > 0 && (
+                                <span className="ml-2 bg-yellow-400 text-gray-900 px-1.5 py-0.5 rounded-full text-[10px] font-bold">
+                                    {sessionGallery.length}
+                                </span>
+                            )}
+                        </button>
+                    </div>
+                    
+                    {/* Tab Content */}
+                    <div className="flex-1 px-4 py-3">
+                        <div className="flex gap-3 overflow-x-auto pb-2 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                            {bannerTab === 'uploads' ? (
+                                <>
+                                    {/* Upload button */}
+                                    <label 
+                                        htmlFor="unified-file-upload"
+                                        className="w-25 h-25 flex-shrink-0 bg-white rounded-lg flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-100 transition-colors"
+                                        aria-label="Upload new image"
+                                    >
+                                        <PlusIcon className="w-6 h-6 text-gray-400" />
+                                        <input
+                                            id="unified-file-upload"
+                                            type="file"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file && file.type.startsWith('image/')) {
+                                                    const reader = new FileReader();
+                                                    reader.onloadend = () => {
+                                                        if (typeof reader.result === 'string') {
+                                                            handleImageUpload(file, reader.result);
+                                                        }
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                                e.target.value = '';
+                                            }}
+                                            className="hidden"
+                                            accept="image/png, image/jpeg, image/webp"
+                                            disabled={loadingState !== 'idle'}
+                                        />
+                                    </label>
+                                    
+                                    {/* Uploaded images */}
+                                    {uploadedImages.map(image => (
+                                        <div key={image.id} className="relative group flex-shrink-0">
+                                            <button 
+                                                onClick={() => handleSelectFromLibrary(image)}
+                                                className={`w-25 h-25 rounded-lg overflow-hidden border-2 transition-all ${
+                                                    selectedImage?.id === image.id 
+                                                        ? 'border-yellow-500 ring-2 ring-yellow-200' 
+                                                        : 'border-gray-200 hover:border-gray-300'
+                                                }`}
+                                                aria-label="Select product image"
+                                            >
+                                                <img src={image.previewUrl} alt="Product" className="w-full h-full object-cover" />
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteFromLibrary(image.id);
+                                                }}
+                                                className="absolute top-1 right-1 bg-gray-600 bg-opacity-80 text-white rounded w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-700"
+                                                aria-label="Delete image"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                </>
+                            ) : (
+                                <>
+                                    {/* Generated images */}
+                                    {sessionGallery.length === 0 ? (
+                                        <div className="w-25 h-25 flex-shrink-0 bg-white rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
+                                            <span className="text-xs text-gray-400">No generations yet</span>
+                                        </div>
+                                    ) : (
+                                        sessionGallery.map((content, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => handleSelectFromGallery(content)}
+                                                className="w-25 h-25 flex-shrink-0 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-yellow-500 focus:border-yellow-500 transition-all"
+                                                aria-label={`Select generation ${index + 1}`}
+                                            >
+                                                <img src={content.imageUrl} alt={`Generation ${index + 1}`} className="w-full h-full object-cover" />
+                                            </button>
+                                        ))
+                                    )}
+                                </>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <main className="flex-grow flex">
+                <Sidebar
                     imageLibrary={uploadedImages}
                     generatedGallery={sessionGallery}
                     selectedImage={selectedImage}
@@ -837,12 +947,12 @@ export const App: React.FC = () => {
                     selectedSloganType={selectedSloganType}
                     onSelectSloganType={setSelectedSloganType}
                     onResetAnalysis={handleResetAnalysis}
-                        onReanalyze={handleReanalyze}
-                    />
-                </div>
-                <div className="flex-1 flex flex-col bg-white">
+                    onReanalyze={handleReanalyze}
+                />
+                <div className="flex-grow px-6 py-6">
+                    <div className="flex-1 min-w-0">
                         {/* Generation Progress - only show when not using full-screen loader */}
-                        {loadingState !== 'generating_image' && loadingState !== 'generating_text' && loadingState !== 'editing' && (
+                        {loadingState !== 'generating_image' && loadingState !== 'generating_text' && (
                             <GenerationProgress 
                                 loadingState={loadingState}
                                 isNaturalEnvironment={isNaturalEnvironmentSelected}
@@ -875,6 +985,7 @@ export const App: React.FC = () => {
                             onImageUpload={handleImageUpload}
                             lastGenerationParams={lastGenerationParams}
                         />
+                    </div>
                 </div>
             </main>
             
@@ -883,7 +994,6 @@ export const App: React.FC = () => {
             {/* Loading Indicators */}
             {isAnalyzing && <AnalysisLoader />}
             {(loadingState === 'generating_image' || loadingState === 'generating_text') && <GenerationLoader />}
-            {loadingState === 'editing' && <EditingLoader />}
             
             {/* Production Status Panel for Multi-Format Generation */}
             <ProductionStatusPanel 
