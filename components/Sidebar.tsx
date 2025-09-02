@@ -398,7 +398,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}
           disabled={!hasImage || isLoading || (activeTab !== 'custom' && selectedFormats.length === 0)}
           style={{ opacity: !hasImage ? 0.5 : 1 }}
-          className="max-w-xs mx-auto px-6 py-3 text-base font-semibold text-white bg-green-500 border-2 border-yellow-400/80 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="max-w-2xl mx-auto px-12 py-3 text-base font-semibold text-white bg-green-500 border-2 border-yellow-400/80 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <span className="flex items-center justify-center gap-2">
             <SparklesIcon className="w-5 h-5" />

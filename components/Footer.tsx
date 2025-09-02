@@ -2,7 +2,7 @@ import React from 'react';
 
 const AutoBananaLogotype: React.FC<{ className?: string }> = ({ className = "h-6 w-auto" }) => (
   <svg className={className} viewBox="0 0 968.1 136.9" xmlns="http://www.w3.org/2000/svg">
-    <style type="text/css">{`.st0{fill:#F9DA82;}`}</style>
+    <style type="text/css">{`.st0{fill:#9ca3af;}`}</style>
     <path className="st0" d="M15.7,121.5L53.8,11.5c.5-1.3,1.8-2,3.1-2h22.3c1.3,0,2.6.7,3.1,2l38,110c.7,1.6-.2,2.8-2,2.8h-22c-1.3,0-2.3-.5-2.8-2l-4.9-15.4h-41.3l-4.9,15.4c-.5,1.5-1.5,2-2.8,2h-21.8c-1.8,0-2.8-1.1-2.1-2.8ZM81.3,83.9l-13.3-41.5-13.3,41.5h26.6Z"/>
     <path className="st0" d="M132.1,95.6v-42.8c0-1.3.9-2.3,2.3-2.3h18.4c1.3,0,2.5.9,2.5,2.3v37.4c0,9.8,4.2,14.9,12.3,14.9s12.8-5.1,12.8-14.9v-37.4c0-1.3,1.1-2.3,2.5-2.3h18.2c1.3,0,2.5.9,2.5,2.3v69.2c0,1.3-1.1,2.3-2.5,2.3h-17.6c-1.3,0-2.3-.7-2.5-2.5l-.7-8.7c-4.2,7.5-10.9,12.8-21.7,12.8-15.4,0-26.5-11.3-26.5-30.6Z"/>
     <path className="st0" d="M227.8,102.5v-41.7h-9.2c-1.3,0-2.3-.9-2.3-2.3v-16.1c0-1.3.9-2.3,2.3-2.3h9.2v-17.3c0-1.3,1.1-2.3,2.5-2.3h18.5c1.3,0,2.5.9,2.5,2.3v17.3h11.3c1.3,0,2.3.9,2.3,2.3v16.1c0,1.3-.9,2.3-2.3,2.3h-11.3v31.7c0,4,2.6,6,6.4,6s2.6,0,4.7-.2c1.5-.2,2.6.7,2.6,2.1v12.5c0,3.8-8.1,4.7-13.3,4.7-12.1,0-23.7-5.6-23.7-22.7Z"/>
@@ -17,7 +17,7 @@ const AutoBananaLogotype: React.FC<{ className?: string }> = ({ className = "h-6
 );
 
 export const Footer: React.FC = () => (
-  <footer className="mt-auto" style={{ backgroundColor: 'rgba(254, 243, 199, 0.8)' }}>
+  <footer className="mt-auto" style={{ backgroundColor: '#6b7280' }}>
     <div className="py-6" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
       <div className="flex justify-between items-center">
         {/* Left side - Subtle logo - matching About/Privacy text color */}
@@ -25,13 +25,13 @@ export const Footer: React.FC = () => (
         
         {/* Right side - Links and copyright */}
         <div className="flex items-center gap-8">
-          <div className="flex gap-6 text-sm" style={{ color: '#D68C5F' }}>
+          <div className="flex gap-6 text-sm" style={{ color: '#e5e7eb' }}>
             <a href="#" className="hover:opacity-80 transition-opacity">About</a>
             <a href="#" className="hover:opacity-80 transition-opacity">Privacy</a>
             <a href="#" className="hover:opacity-80 transition-opacity">Terms</a>
             <a href="#" className="hover:opacity-80 transition-opacity">Contact</a>
           </div>
-          <p className="text-sm" style={{ color: '#D68C5F' }}>
+          <p className="text-sm" style={{ color: '#e5e7eb' }}>
             © 2025 AutoBanana. All rights reserved.
           </p>
         </div>

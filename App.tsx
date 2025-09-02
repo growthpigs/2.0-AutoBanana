@@ -931,7 +931,7 @@ export const App: React.FC = () => {
                 </div>
             </div>
             
-            <main className="flex-grow flex bg-white">
+            <div className="flex-grow flex bg-white">
                 <Sidebar
                     imageLibrary={uploadedImages}
                     generatedGallery={sessionGallery}
@@ -950,41 +950,43 @@ export const App: React.FC = () => {
                     onResetAnalysis={handleResetAnalysis}
                     onReanalyze={handleReanalyze}
                 />
-                {/* Generation Progress - only show when not using full-screen loader */}
-                {loadingState !== 'generating_image' && loadingState !== 'generating_text' && (
-                    <GenerationProgress 
-                        loadingState={loadingState}
-                        isNaturalEnvironment={isNaturalEnvironmentSelected}
-                        selectedFormatName={selectedFormat?.name}
-                    />
-                )}
-                
-                <Workspace
+                <main className="flex-grow flex flex-col bg-white">
+                    {/* Generation Progress - only show when not using full-screen loader */}
+                    {loadingState !== 'generating_image' && loadingState !== 'generating_text' && (
+                        <GenerationProgress 
                             loadingState={loadingState}
-                            generatedContent={generatedContent}
-                            error={error}
-                            onEdit={handleEdit}
-                            onUndo={handleUndo}
-                            onRedo={handleRedo}
-                            onReset={handleReset}
-                            onUploadNew={handleUploadNew}
-                            canUndo={canUndo}
-                            canRedo={canRedo}
-                            isContentGenerated={isContentGenerated}
-                            isLoading={isLoading}
-                            isRepositionMode={isRepositionMode}
-                            onToggleRepositionMode={handleToggleRepositionMode}
-                            onRepositionClick={handleRepositionClick}
-                            onRegenerateImage={handleRegenerateImage}
-                            onRegenerateText={handleRegenerateText}
-                            onNewVariation={handleNewVariation}
-                            sessionGallery={sessionGallery}
-                            onSelectFromGallery={handleSelectFromGallery}
-                            onFacebookAdTextChange={handleFacebookAdTextChange}
-                            onImageUpload={handleImageUpload}
-                            lastGenerationParams={lastGenerationParams}
+                            isNaturalEnvironment={isNaturalEnvironmentSelected}
+                            selectedFormatName={selectedFormat?.name}
                         />
-            </main>
+                    )}
+                    
+                    <Workspace
+                                loadingState={loadingState}
+                                generatedContent={generatedContent}
+                                error={error}
+                                onEdit={handleEdit}
+                                onUndo={handleUndo}
+                                onRedo={handleRedo}
+                                onReset={handleReset}
+                                onUploadNew={handleUploadNew}
+                                canUndo={canUndo}
+                                canRedo={canRedo}
+                                isContentGenerated={isContentGenerated}
+                                isLoading={isLoading}
+                                isRepositionMode={isRepositionMode}
+                                onToggleRepositionMode={handleToggleRepositionMode}
+                                onRepositionClick={handleRepositionClick}
+                                onRegenerateImage={handleRegenerateImage}
+                                onRegenerateText={handleRegenerateText}
+                                onNewVariation={handleNewVariation}
+                                sessionGallery={sessionGallery}
+                                onSelectFromGallery={handleSelectFromGallery}
+                                onFacebookAdTextChange={handleFacebookAdTextChange}
+                                onImageUpload={handleImageUpload}
+                                lastGenerationParams={lastGenerationParams}
+                            />
+                </main>
+            </div>
             
             <Footer />
 
