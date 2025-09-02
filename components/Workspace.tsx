@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { EditingTools } from './EditingTools';
-// FIX: Import LastGenerationParams to use in props.
 import { LoadingState, LastGenerationParams } from '../App';
-import { GeneratedContent, FacebookAdContent, MockupContent } from '../types';
+import { GeneratedContent, FacebookAdContent } from '../types';
 import { FacebookAdPreview } from './FacebookAdPreview';
 
 interface WorkspaceProps {
@@ -27,77 +26,117 @@ interface WorkspaceProps {
   sessionGallery: GeneratedContent[];
   onSelectFromGallery: (content: GeneratedContent) => void;
   onFacebookAdTextChange: (newContent: Partial<FacebookAdContent>) => void;
-  // FIX: Add missing lastGenerationParams prop.
+  onImageUpload: (file: File, previewUrl: string) => void;
   lastGenerationParams: LastGenerationParams | null;
 }
 
-const LoadingIndicator: React.FC<{ state: LoadingState }> = ({ state }) => {
-    const messages = {
-        'generating_text': 'Writing compelling ad copy...',
-        'generating_image': 'Creating your ad creative...',
-        'editing': 'Applying your edits...',
-        'describing': 'Analyzing your product...',
-        'idle': 'Starting up...',
-    };
-    return (
-      <div className="flex flex-col items-center justify-center w-full h-full text-center">
-        <div className="relative w-16 h-16">
-          <div className="absolute inset-0 border-4 border-indigo-200 rounded-full"></div>
-          <div className="absolute inset-0 border-4 border-t-indigo-600 border-l-indigo-600 border-b-indigo-600/10 border-r-indigo-600/10 rounded-full animate-spin"></div>
+const ErrorState: React.FC<{ error: string }> = ({ error }) => (
+    <div className="flex items-center justify-center w-full h-full">
+        <div className="text-center p-6 max-w-md">
+            <div className="text-red-500 text-4xl mb-4">⚠️</div>
+            <h3 className="text-xl font-semibold text-gray-800 mb-2">Oops! Something went wrong</h3>
+            <p className="text-gray-600">{error}</p>
         </div>
-        <p className="mt-4 text-lg font-semibold text-indigo-700">{messages[state]}</p>
-        <p className="mt-1 text-sm text-gray-500">This can take a moment.</p>
-      </div>
-    );
-};
-
-const InitialState: React.FC = () => (
-    <div className="flex flex-col items-center justify-center text-center text-gray-400 h-full">
-        <ImageIcon className="w-20 h-20 mb-4" />
-        <h3 className="text-xl font-bold text-gray-600">Your Ad Awaits</h3>
-        <p className="text-gray-500 mt-2">Select a format from the sidebar to begin.</p>
     </div>
 );
 
-const ErrorState: React.FC<{ error: string }> = ({ error }) => {
-    const isSafetyError = error.includes('PROHIBITED_CONTENT') || error.includes('SAFETY');
-    return (
-      <div className="flex flex-col items-center justify-center text-center p-4">
-          <WarningIcon className="w-16 h-16 text-red-500 mb-4" />
-          <h3 className="text-xl font-bold text-red-600">Generation Failed</h3>
-          <p className="text-gray-600 mt-2 max-w-md bg-red-50 p-3 rounded-lg border border-red-200">{error}</p>
-          {isSafetyError && (
-              <div className="mt-4 text-left text-sm text-gray-500 max-w-md p-4 bg-gray-50 rounded-lg border">
-                  <h4 className="font-semibold text-gray-700 mb-2">This may have been caused by a safety filter.</h4>
-                  <p className="mb-2">To get the best results, please try the following:</p>
-                  <ul className="list-disc list-inside space-y-1">
-                      <li>Try using a different product image.</li>
-                      <li>Select a different ad format or slogan style.</li>
-                      <li>If using the "Adjust" tool, try a more neutral description.</li>
-                  </ul>
-                   <p className="mt-3">The model avoids generating certain types of content. Your request may have been too close to a restricted category.</p>
-              </div>
-          )}
+const InitialState: React.FC<{ onImageUpload: (file: File, previewUrl: string) => void }> = ({ onImageUpload }) => {
+  // Add CSS for animation
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes rock {
+        0%, 100% { transform: rotate(-5deg); }
+        50% { transform: rotate(5deg); }
+      }
+      .banana-rock {
+        animation: rock 3s ease-in-out infinite;
+        transform-origin: center;
+      }
+    `;
+    document.head.appendChild(style);
+    return () => document.head.removeChild(style);
+  }, []);
+
+  const handleFile = (file: File | undefined) => {
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === 'string') {
+          onImageUpload(file, reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    handleFile(selectedFile);
+    event.target.value = '';
+  };
+
+  const onDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+  };
+
+  const onDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    const droppedFile = event.dataTransfer.files?.[0];
+    handleFile(droppedFile);
+  };
+
+  return (
+    <label 
+      htmlFor="workspace-file-upload"
+      className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-gray-300/80 rounded-lg cursor-pointer hover:border-gray-400/80 transition-colors"
+      style={{ backgroundColor: '#fafafa' }}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+    >
+      <input
+        id="workspace-file-upload"
+        type="file"
+        className="hidden"
+        accept="image/*"
+        onChange={handleFileChange}
+      />
+      <div className="w-[60px] h-[60px] mb-3 banana-rock">
+        <img 
+          src="/banana-icon.png"
+          alt="Banana"
+          className="w-full h-full opacity-30"
+        />
       </div>
-    );
+      <p className="text-gray-600 font-medium">Click to upload or drag and drop</p>
+      <p className="text-gray-500 text-sm mt-1">PNG, JPG, or WEBP (Max 4MB)</p>
+    </label>
+  );
 };
 
-
 export const Workspace: React.FC<WorkspaceProps> = (props) => {
-  const { loadingState, generatedContent, error, isContentGenerated, isRepositionMode, onRepositionClick, sessionGallery, onSelectFromGallery } = props;
+  const { 
+    loadingState, 
+    generatedContent, 
+    error, 
+    isRepositionMode, 
+    onRepositionClick, 
+    onImageUpload,
+    isContentGenerated 
+  } = props;
 
-  // Responsive width calculation: min 650px (middle ground), max 785px
+  // Responsive width calculation: min 500px, max 785px
   const [containerWidth, setContainerWidth] = useState(785);
   
   useEffect(() => {
     const calculateWidth = () => {
       const viewportWidth = window.innerWidth;
       const sidebarWidth = 400;
-      const padding = 80;
+      const padding = 80; // Account for workspace padding
       const availableWidth = viewportWidth - sidebarWidth - padding;
       
-      // Scale between 650px (middle ground) and 785px (full)
-      const width = Math.min(785, Math.max(650, availableWidth));
+      // Scale between 500px (minimum for small screens) and 785px (full)
+      const width = Math.min(785, Math.max(500, availableWidth));
       setContainerWidth(width);
     };
     
@@ -109,62 +148,52 @@ export const Workspace: React.FC<WorkspaceProps> = (props) => {
   const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
     if (!isRepositionMode || !generatedContent || 'headline' in generatedContent) return;
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width; // 0 to 1
-    const y = (e.clientY - rect.top) / rect.height; // 0 to 1
+    const x = (e.clientX - rect.left) / rect.width;
+    const y = (e.clientY - rect.top) / rect.height;
     onRepositionClick(x, y);
   };
 
   const renderContent = () => {
-    if (loadingState !== 'idle') return <LoadingIndicator state={loadingState} />;
     if (error) return <ErrorState error={error} />;
+    
     if (generatedContent) {
-        if ('headline' in generatedContent) { // It's a FacebookAdContent
-            return <FacebookAdPreview content={generatedContent} onTextChange={props.onFacebookAdTextChange} />
-        } else { // It's a MockupContent
-            return (
-                <img 
-                    src={generatedContent.imageUrl} 
-                    alt="Generated ad mockup" 
-                    className={`w-full h-full object-contain ${isRepositionMode ? 'cursor-crosshair' : ''}`}
-                    onClick={handleImageClick}
-                />
-            );
-        }
+      if ('headline' in generatedContent) {
+        return <FacebookAdPreview content={generatedContent} onTextChange={props.onFacebookAdTextChange} />
+      } else {
+        return (
+          <img 
+            src={generatedContent.imageUrl} 
+            alt="Generated ad mockup" 
+            className={`w-full h-full object-contain ${isRepositionMode ? 'cursor-crosshair' : ''}`}
+            onClick={handleImageClick}
+          />
+        );
+      }
     }
-    return <InitialState />;
+    
+    return <InitialState onImageUpload={onImageUpload} />;
   };
 
-  const renderGalleryItem = (content: GeneratedContent, index: number) => {
-      return (
-        <button 
-            key={index} 
-            onClick={() => onSelectFromGallery(content)} 
-            className="aspect-square bg-gray-100 rounded-md overflow-hidden border-2 border-transparent hover:border-indigo-500 focus:border-indigo-500 focus:outline-none transition-colors"
-            aria-label={`Select variation ${index + 1}`}
-        >
-            <img src={content.imageUrl} alt={`Variation ${index + 1}`} className="w-full h-full object-cover" />
-        </button>
-      )
-  }
-
   return (
-    <div className="flex flex-col w-full h-full gap-6">
-        <div className="flex-grow bg-white rounded-xl shadow-lg w-full min-h-[50vh] max-h-[60vh] flex items-center justify-center p-4 border border-gray-200">
+    <div className="flex flex-col h-full bg-white">
+      {/* Main Content Area - Square container for image with tools directly below */}
+      <div className="flex-1 flex items-start justify-start p-8">
+        <div className="flex flex-col items-center">
+          {/* Square Image Container */}
+          <div className="aspect-square rounded-lg overflow-hidden" style={{ width: `${containerWidth}px` }}>
             {renderContent()}
+          </div>
+          
+          {/* Persistent Editing Tools - Locked to image container */}
+          <div className="border-t border-gray-200/80 mt-4" style={{ width: `${containerWidth}px` }}>
+            <EditingTools 
+              {...props} 
+              isDisabled={!generatedContent}
+              containerWidth={containerWidth}
+            />
+          </div>
         </div>
-        
-        {isContentGenerated && (
-             <EditingTools {...props} containerWidth={containerWidth} />
-        )}
-
-        {sessionGallery.length > 0 && (
-            <div className="bg-white rounded-xl shadow-lg p-4 border border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-800 mb-3">Session Variations</h3>
-                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                    {sessionGallery.map(renderGalleryItem)}
-                </div>
-            </div>
-        )}
+      </div>
     </div>
   );
 };

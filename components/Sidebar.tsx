@@ -1,244 +1,386 @@
 import React, { useState } from 'react';
-import { AdFormat, SloganType, UploadedImage, FormatType } from '../types';
+import { SloganType, UploadedImage, SmartProductInput, AdFormat } from '../types';
+import { PlusIcon, SparklesIcon, XIcon, CheckCircle } from 'lucide-react';
 import { AD_FORMATS, SOCIAL_MEDIA_FORMATS, FACEBOOK_AD_FORMATS } from '../constants';
-import { PlusIcon, SparklesIcon } from './Icons';
+import { FormatSelectionGrid } from './FormatSelectionGrid';
 
 interface SidebarProps {
   imageLibrary: UploadedImage[];
+  generatedGallery: any[];
   selectedImage: UploadedImage;
   onSelectFromLibrary: (image: UploadedImage) => void;
-  onGenerate: (format: AdFormat, sloganType: SloganType | null) => void;
+  onDeleteFromLibrary: (imageId: string) => void;
+  onGenerate: (environmentOrFormats?: string | AdFormat[]) => void;
   isLoading: boolean;
-  isImageGenerated: boolean;
-  imageDescription: string;
-  onDescriptionChange: (description: string) => void;
+  smartInput: SmartProductInput;
+  onSmartInputChange: (input: SmartProductInput) => void;
   isDescriptionLoading: boolean;
   onImageUpload: (file: File, previewUrl: string) => void;
   onGenerateDescription: () => void;
+  selectedSloganType: SloganType | null;
+  onSelectSloganType: (type: SloganType | null) => void;
+  onResetAnalysis: () => void;
+  onReanalyze: () => void;
 }
 
-const TABS: { name: string, type: FormatType }[] = [
-    { name: 'Mockups', type: 'mockup' },
-    { name: 'Social Posts', type: 'social' },
-    { name: 'Facebook Ads', type: 'facebook' },
-];
-const MAX_DESC_LENGTH = 800;
-
-const DescriptionLoader: React.FC = () => (
-    <div className="space-y-2 animate-pulse">
-        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-        <div className="h-16 bg-gray-200 rounded-md"></div>
-        <div className="h-3 bg-gray-200 rounded w-1/4 ml-auto"></div>
-    </div>
-);
+type TabType = 'custom' | 'mockups' | 'social' | 'facebook';
 
 export const Sidebar: React.FC<SidebarProps> = ({
   imageLibrary,
+  generatedGallery,
   selectedImage,
   onSelectFromLibrary,
+  onDeleteFromLibrary,
   onGenerate,
   isLoading,
-  isImageGenerated,
-  imageDescription,
-  onDescriptionChange,
+  smartInput,
+  onSmartInputChange,
   isDescriptionLoading,
   onImageUpload,
   onGenerateDescription,
+  selectedSloganType,
+  onSelectSloganType,
+  onResetAnalysis,
+  onReanalyze,
 }) => {
-    const [activeTab, setActiveTab] = useState(0);
-    const [selectedFormat, setSelectedFormat] = useState<AdFormat | null>(null);
-    const [selectedSloganType, setSelectedSloganType] = useState<SloganType | null>(null);
-
-    const handleGenerateClick = () => {
-        if (selectedFormat) {
-            onGenerate(selectedFormat, selectedSloganType);
-        }
-    };
-
-    const handleFormatSelect = (format: AdFormat) => {
-        setSelectedFormat(format);
-        onGenerate(format, selectedSloganType);
-    };
-    
-    const sloganTypes: { id: SloganType; name: string }[] = [
-        { id: 'hook', name: 'Hook' },
-        { id: 'tagline', name: 'Tagline' },
-        { id: 'meme', name: 'Meme Text' },
-        { id: 'joke', name: 'Joke' },
-        { id: 'quote', name: 'Quote' },
-        { id: 'fun_fact', name: 'Fun Fact' },
-    ];
-    
-    const getFormatsForTab = (tabIndex: number) => {
-        switch (TABS[tabIndex].type) {
-            case 'mockup': return AD_FORMATS;
-            case 'social': return SOCIAL_MEDIA_FORMATS;
-            case 'facebook': return FACEBOOK_AD_FORMATS;
-            default: return [];
-        }
+  const [activeTab, setActiveTab] = useState<TabType>('custom');
+  const [selectedFormats, setSelectedFormats] = useState<AdFormat[]>([]);
+  const [selectedEnvironment, setSelectedEnvironment] = useState<string | null>(null);
+  const contentRef = React.useRef<HTMLDivElement>(null);
+  const buttonsRef = React.useRef<HTMLDivElement>(null);
+  
+  React.useEffect(() => {
+    if (selectedImage?.analysis?.naturalEnvironments && selectedImage.analysis.naturalEnvironments.length > 0) {
+      if (!selectedEnvironment || !selectedImage.analysis.naturalEnvironments.includes(selectedEnvironment)) {
+        setSelectedEnvironment(selectedImage.analysis.naturalEnvironments[0]);
+      }
     }
-    const currentFormats = getFormatsForTab(activeTab);
+  }, [selectedImage?.analysis?.naturalEnvironments]);
 
-    const handleFile = (file: File | undefined) => {
-        if (file && file.type.startsWith('image/')) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                if (typeof reader.result === 'string') {
-                    onImageUpload(file, reader.result);
-                }
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+  // Diagnostic logging for button positioning issue
+  React.useEffect(() => {
+    console.log(`🔍 TAB CHANGE: Active tab is now '${activeTab}'`);
+    
+    // Measure content height after tab change
+    setTimeout(() => {
+      if (contentRef.current && buttonsRef.current) {
+        const contentHeight = contentRef.current.scrollHeight;
+        const contentBottom = contentRef.current.getBoundingClientRect().bottom;
+        const buttonsTop = buttonsRef.current.getBoundingClientRect().top;
+        const actualGap = buttonsTop - contentBottom;
+        
+        console.log(`📏 MEASUREMENTS for '${activeTab}' tab:`);
+        console.log(`   - Content height: ${contentHeight}px`);
+        console.log(`   - Gap between content and buttons: ${actualGap}px`);
+        console.log(`   - Target gap should be: 30px`);
+        console.log(`   - Gap difference: ${actualGap - 30}px`);
+      }
+    }, 100); // Small delay to let DOM update
+  }, [activeTab]);
 
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        handleFile(event.target.files?.[0]);
-    };
+  const hasImage = !!selectedImage;
+  const hasAnalysis = !!selectedImage?.analysis;
+  
+  const sloganTypes: { id: SloganType; name: string }[] = [
+    { id: 'hook', name: 'Hook' },
+    { id: 'tagline', name: 'Tagline' },
+    { id: 'meme', name: 'Meme' },
+    { id: 'joke', name: 'Joke' },
+    { id: 'quote', name: 'Quote' },
+    { id: 'fun_fact', name: 'Fun Fact' },
+  ];
 
-    return (
-        <aside className="w-96 bg-white/80 backdrop-blur-lg border-r border-gray-200 p-6 flex flex-col space-y-6 overflow-y-auto" style={{ minWidth: '384px' }}>
-            {/* Image Library */}
-            <div className="space-y-3">
-                <h2 className="text-lg font-bold text-gray-800">Image Library</h2>
-                <div className="grid grid-cols-4 gap-2">
-                    <label 
-                        htmlFor="sidebar-file-upload"
-                        className="aspect-square bg-gray-100 rounded-md flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 hover:border-indigo-500 hover:bg-gray-50 transition-colors"
-                        aria-label="Upload new image"
-                    >
-                        <PlusIcon className="w-6 h-6 text-gray-400" />
-                        <input
-                            id="sidebar-file-upload"
-                            type="file"
-                            onChange={handleFileChange}
-                            className="hidden"
-                            accept="image/png, image/jpeg, image/webp"
-                            disabled={isLoading}
-                        />
-                    </label>
-                    {imageLibrary.map(image => (
-                        <button 
-                            key={image.id}
-                            onClick={() => onSelectFromLibrary(image)}
-                            className={`aspect-square bg-gray-100 rounded-md overflow-hidden border-2 transition-colors ${selectedImage.id === image.id ? 'border-indigo-500' : 'border-transparent hover:border-gray-300'}`}
-                            aria-label="Select product image"
-                        >
-                            <img src={image.previewUrl} alt="Product preview" className="w-full h-full object-cover" />
-                        </button>
-                    ))}
-                </div>
-            </div>
-            
-            <div className="border-t border-gray-200 -mx-6"></div>
+  const toggleFormat = (format: AdFormat) => {
+    setSelectedFormats(prev => {
+      const exists = prev.find(f => f.id === format.id);
+      if (exists) {
+        return prev.filter(f => f.id !== format.id);
+      } else {
+        return [...prev, format];
+      }
+    });
+  };
 
-            {/* Product Description */}
-             <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                    <h2 className="text-lg font-bold text-gray-800">Product Description</h2>
+  const mockupCount = AD_FORMATS.length;
+  const socialCount = SOCIAL_MEDIA_FORMATS.length;
+  const facebookCount = FACEBOOK_AD_FORMATS.length;
+
+  return (
+    <div className="flex flex-col h-full bg-yellow-50 border-r border-gray-300/30">
+      {/* Tabs */}
+      <div className="flex bg-gray-100 border-b border-gray-200/10">
+        <button
+          onClick={() => setActiveTab('custom')}
+          className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors font-mono border-r border-gray-200/10
+            ${activeTab === 'custom' 
+              ? 'bg-yellow-50 text-gray-900 border-b-2 border-b-yellow-400' 
+              : 'bg-gray-100 text-gray-500 hover:bg-gray-50'}`}
+          style={{ fontFamily: 'JetBrains Mono' }}
+        >
+          CUSTOM
+        </button>
+        <button
+          onClick={() => setActiveTab('mockups')}
+          className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors font-mono border-r border-gray-200/10
+            ${activeTab === 'mockups' 
+              ? 'bg-yellow-50 text-gray-900 border-b-2 border-b-yellow-400' 
+              : 'bg-gray-100 text-gray-500 hover:bg-gray-50'}`}
+          style={{ fontFamily: 'JetBrains Mono' }}
+        >
+          MOCKUPS
+        </button>
+        <button
+          onClick={() => setActiveTab('social')}
+          className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors font-mono border-r border-gray-200/10
+            ${activeTab === 'social' 
+              ? 'bg-yellow-50 text-gray-900 border-b-2 border-b-yellow-400' 
+              : 'bg-gray-100 text-gray-500 hover:bg-gray-50'}`}
+          style={{ fontFamily: 'JetBrains Mono' }}
+        >
+          SOCIAL
+        </button>
+        <button
+          onClick={() => setActiveTab('facebook')}
+          className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider transition-colors font-mono
+            ${activeTab === 'facebook' 
+              ? 'bg-yellow-50 text-gray-900 border-b-2 border-b-yellow-400' 
+              : 'bg-gray-100 text-gray-500 hover:bg-gray-50'}`}
+          style={{ fontFamily: 'JetBrains Mono' }}
+        >
+          FACEBOOK
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div ref={contentRef} className="overflow-y-auto p-3" style={{ minHeight: '500px', maxHeight: 'calc(100vh - 260px)' }}>
+        {activeTab === 'custom' && (
+          <div className="space-y-3">
+            {/* AI Analysis Status */}
+            <div className={`rounded-lg border ${hasAnalysis ? 'bg-green-500 border-green-600' : 'bg-yellow-50 border-yellow-200/80'} transition-all duration-300`} style={{ minHeight: '50px' }}>
+              {hasAnalysis ? (
+                <div className="flex items-center justify-between p-3">
+                  <div className="flex items-center gap-2">
                     <button
-                        onClick={onGenerateDescription}
-                        disabled={isDescriptionLoading || isLoading}
-                        className="flex items-center gap-1.5 py-1 px-2 text-xs font-semibold text-indigo-600 bg-indigo-50 rounded-md hover:bg-indigo-100 disabled:opacity-50 transition-colors"
+                      onClick={() => onReanalyze()}
+                      disabled={isLoading}
+                      className="px-2 py-1 text-xs font-medium text-green-600 bg-white rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
                     >
-                        <SparklesIcon className="w-3 h-3" />
-                        Generate with AI
+                      <SparklesIcon className="w-3 h-3" />
+                      Re-analyze
                     </button>
+                  </div>
+                  <div className="flex items-center gap-2 text-white">
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="text-sm font-medium">🤖 Analysis Complete</span>
+                    <span className="text-xs bg-white/20 px-2 py-1 rounded">
+                      {selectedImage?.analysis?.confidence || 95}%
+                    </span>
+                  </div>
                 </div>
-                {isDescriptionLoading ? <DescriptionLoader /> : (
-                    <>
-                        <p className="text-xs text-gray-500">The AI's understanding of your product. Edit it for better results.</p>
-                        <textarea
-                            value={imageDescription}
-                            onChange={(e) => onDescriptionChange(e.target.value)}
-                            rows={4}
-                            maxLength={MAX_DESC_LENGTH}
-                            className="w-full p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                            placeholder="Describe your product here..."
-                            disabled={isLoading}
-                        />
-                        <p className="text-right text-xs text-gray-400">
-                            {imageDescription.length} / {MAX_DESC_LENGTH}
-                        </p>
-                    </>
-                )}
+              ) : (
+                <div className="flex items-center justify-between p-3">
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onReanalyze()}
+                      disabled={!hasImage || isLoading}
+                      className="px-2 py-1 text-xs font-medium text-gray-600 bg-yellow-50 border border-gray-300/80 rounded hover:bg-yellow-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+                    >
+                      <SparklesIcon className="w-3 h-3" />
+                      Re-analyze
+                    </button>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
+                    <span className="font-medium opacity-70">AI Analysis Pending</span>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="border-t border-gray-200 -mx-6"></div>
-
-            {/* Content Tabs */}
+            {/* Product Title */}
             <div>
-                <div className="border-b border-gray-200 mb-4">
-                    <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-                        {TABS.map((tab, index) => (
-                            <button
-                                key={tab.name}
-                                onClick={() => {
-                                    setActiveTab(index);
-                                    setSelectedFormat(null);
-                                }}
-                                className={`${
-                                    activeTab === index
-                                    ? 'border-indigo-500 text-indigo-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors`}
-                            >
-                                {tab.name}
-                            </button>
-                        ))}
-                    </nav>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                    {currentFormats.map((format) => (
-                        <button
-                          key={format.id}
-                          onClick={() => handleFormatSelect(format)}
-                          disabled={isLoading}
-                          className={`group flex flex-col items-center justify-center p-2 text-center rounded-md aspect-square transition-all
-                            ${isLoading ? 'cursor-not-allowed bg-gray-100 text-gray-400' : 'ring-1 ring-gray-200'}
-                            ${selectedFormat?.id === format.id ? 'ring-2 ring-indigo-500 bg-indigo-50' : 'bg-white hover:bg-indigo-50'}
-                          `}
-                          aria-label={`Select ${format.name} format`}
-                        >
-                          <format.icon className={`w-6 h-6 mb-1.5 transition-colors ${selectedFormat?.id === format.id ? 'text-indigo-600' : 'text-gray-500 group-hover:text-indigo-600'}`} />
-                          <span className={`text-xs font-medium transition-colors ${selectedFormat?.id === format.id ? 'text-indigo-700' : 'text-gray-600 group-hover:text-indigo-700'}`}>{format.name}</span>
-                        </button>
-                    ))}
-                </div>
+              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Product Title</label>
+              <input
+                type="text"
+                value={smartInput.title}
+                onChange={(e) => onSmartInputChange({ ...smartInput, title: e.target.value })}
+                className={`w-full px-3 py-1.5 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
+                placeholder="Enter product title"
+              />
             </div>
 
-            {TABS[activeTab].type !== 'facebook' && (
-                <>
-                <div className="border-t border-gray-200 -mx-6"></div>
-                {/* Slogan Style */}
-                <div className="space-y-3">
-                    <h2 className="text-lg font-bold text-gray-800">Slogan Style</h2>
-                    <p className="text-xs text-gray-500">Optional. Select a style for an AI-generated slogan to be added.</p>
-                    <div className="grid grid-cols-3 gap-2">
-                        {sloganTypes.map(type => (
-                            <button
-                                key={type.id}
-                                onClick={() => setSelectedSloganType(current => current === type.id ? null : type.id)}
-                                disabled={isLoading}
-                                className={`py-2 px-1 text-xs font-semibold rounded-md transition-colors border ${
-                                    selectedSloganType === type.id ? 'bg-indigo-600 text-white border-indigo-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-100'
-                                } ${isLoading ? 'opacity-50' : ''}`}
-                            >
-                                {type.name}
-                            </button>
-                        ))}
-                    </div>
+            {/* Industry */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Industry</label>
+              <div className="relative">
+                <select
+                  value={smartInput.industry || ''}
+                  onChange={(e) => onSmartInputChange({ ...smartInput, industry: e.target.value as any })}
+                  className={`w-full px-3 pr-10 py-1.5 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
+                >
+                  <option value="" className="text-gray-400">Select Industry</option>
+                  <option value="Entertainment & Media">Entertainment & Media</option>
+                  <option value="Technology">Technology</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Food & Beverage">Food & Beverage</option>
+                  <option value="Health & Wellness">Health & Wellness</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </div>
-                </>
-            )}
-            
-            <button 
-                onClick={handleGenerateClick}
-                disabled={isLoading || !selectedFormat}
-                className="w-full text-center py-3 px-6 rounded-lg bg-green-500 border-2 border-yellow-400 text-white font-semibold hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed"
-                style={{ marginTop: '25px' }}
-            >
-                {isLoading ? 'Generating...' : 'Generate Mockup'}
-            </button>
-        </aside>
-    );
+              </div>
+            </div>
+
+            {/* Target Audience */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Target Audience</label>
+              <div className="relative">
+                <select
+                  value={smartInput.targetAudience || ''}
+                  onChange={(e) => onSmartInputChange({ ...smartInput, targetAudience: e.target.value as any })}
+                  className={`w-full px-3 pr-10 py-1.5 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
+                >
+                  <option value="" className="text-gray-400">Select Audience</option>
+                  <option value="Gen Z (18-26)">Gen Z (18-26)</option>
+                  <option value="Millennials (27-42)">Millennials (27-42)</option>
+                  <option value="Gen X (43-58)">Gen X (43-58)</option>
+                  <option value="Boomers (59+)">Boomers (59+)</option>
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Description</label>
+              <textarea
+                value={smartInput.description}
+                onChange={(e) => onSmartInputChange({ ...smartInput, description: e.target.value })}
+                className={`w-full px-3 py-2 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
+                placeholder="Describe your product..."
+                rows={4}
+              />
+            </div>
+
+            {/* Instructions */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Instructions (Optional)</label>
+              <textarea
+                value={smartInput.instructions || ''}
+                onChange={(e) => onSmartInputChange({ ...smartInput, instructions: e.target.value })}
+                className={`w-full px-3 py-2 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 resize-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
+                placeholder="Any specific instructions for the AI..."
+                rows={3}
+              />
+            </div>
+
+            {/* Natural Environment Options */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>
+                Natural Environment Options
+              </label>
+              <p className="text-xs text-gray-400 ml-1" style={{ marginBottom: '6px', marginTop: '-4px' }}>AI-selected environments for your product</p>
+              <div className="grid grid-cols-3 gap-2">
+                {(selectedImage?.analysis?.naturalEnvironments || ['Studio', 'Outdoor', 'Urban', 'Home', 'Office', 'Nature']).slice(0, 6).map((env) => (
+                  <button
+                    key={env}
+                    onClick={() => setSelectedEnvironment(env)}
+                    disabled={!selectedImage?.analysis?.naturalEnvironments}
+                    className={`p-2 text-xs font-medium uppercase rounded-lg border transition-all ${
+                      selectedEnvironment === env
+                        ? 'border-yellow-500/80 bg-yellow-50 text-gray-900'
+                        : `border-gray-300/80 ${!selectedImage?.analysis?.naturalEnvironments ? 'bg-yellow-50' : 'bg-white'} text-gray-700 hover:border-gray-400/80`
+                    } ${!selectedImage?.analysis?.naturalEnvironments ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {env}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Text Options */}
+            <div>
+              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Text (Optional)</label>
+              <p className="text-xs text-gray-400 ml-1" style={{ marginBottom: '6px', marginTop: '-4px' }}>AI will create an appropriate phrase and add it to the image</p>
+              <div className="grid grid-cols-3 gap-2">
+                {sloganTypes.map((type) => (
+                  <button
+                    key={type.id}
+                    onClick={() => onSelectSloganType(selectedSloganType === type.id ? null : type.id)}
+                    disabled={!hasImage}
+                    className={`p-2 text-xs font-medium uppercase rounded-lg border transition-all ${
+                      selectedSloganType === type.id
+                        ? 'border-yellow-500/80 bg-yellow-50 text-gray-900'
+                        : `border-gray-300/80 ${!hasImage ? 'bg-yellow-50' : 'bg-white'} text-gray-700 hover:border-gray-400/80`
+                    } ${!hasImage ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    {type.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'mockups' && (
+          <FormatSelectionGrid
+            formats={AD_FORMATS}
+            selectedFormats={selectedFormats}
+            onToggleFormat={toggleFormat}
+            category="mockups"
+            getRecommendedFormats={() => []}
+            isFormatRecommended={() => false}
+          />
+        )}
+
+        {activeTab === 'social' && (
+          <FormatSelectionGrid
+            formats={SOCIAL_MEDIA_FORMATS}
+            selectedFormats={selectedFormats}
+            onToggleFormat={toggleFormat}
+            category="social"
+            getRecommendedFormats={() => []}
+            isFormatRecommended={() => false}
+          />
+        )}
+
+        {activeTab === 'facebook' && (
+          <FormatSelectionGrid
+            formats={FACEBOOK_AD_FORMATS}
+            selectedFormats={selectedFormats}
+            onToggleFormat={toggleFormat}
+            category="facebook"
+            getRecommendedFormats={() => []}
+            isFormatRecommended={() => false}
+          />
+        )}
+      </div>
+
+      {/* Bottom Action Buttons - Now in normal flow with 25px margin */}
+      <div ref={buttonsRef} className="p-3 flex gap-2 bg-yellow-50" style={{ marginTop: '25px', alignItems: 'center', flexShrink: 0 }}>
+        <button
+          onClick={() => {
+            if (activeTab === 'custom' && selectedEnvironment) {
+              onGenerate(selectedEnvironment);
+            } else if (selectedFormats.length > 0) {
+              onGenerate(selectedFormats);
+            }
+          }}
+          disabled={!hasImage || isLoading || (activeTab !== 'custom' && selectedFormats.length === 0)}
+          style={{ opacity: !hasImage ? 0.5 : 1 }}
+          className="w-full px-6 py-3 text-base font-semibold text-white bg-green-500 border-2 border-yellow-400/80 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          <span className="flex items-center justify-center gap-2">
+            <SparklesIcon className="w-5 h-5" />
+            GENERATE
+          </span>
+        </button>
+      </div>
+    </div>
+  );
 };
