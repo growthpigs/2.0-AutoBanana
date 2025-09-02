@@ -33,7 +33,7 @@ export const ProfessionalHeader: React.FC<ProfessionalHeaderProps> = ({
             onClick={() => setShowProjectMenu(!showProjectMenu)}
             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
           >
-            <div className="w-6 h-6 bg-yellow-400 rounded flex items-center justify-center">
+            <div className="w-6 h-6 bg-yellow-600 rounded flex items-center justify-center">
               <img 
                 src="/AutoBanana/Auto-logoMark.svg" 
                 alt="AutoBanana" 
@@ -50,7 +50,7 @@ export const ProfessionalHeader: React.FC<ProfessionalHeaderProps> = ({
                 Personal Account
               </div>
               <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-50">
-                <div className="w-6 h-6 bg-yellow-400 rounded flex items-center justify-center">
+                <div className="w-6 h-6 bg-yellow-600 rounded flex items-center justify-center">
                   <img 
                     src="/AutoBanana/Auto-logoMark.svg" 
                     alt="AutoBanana" 
