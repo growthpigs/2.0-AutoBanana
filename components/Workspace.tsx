@@ -125,8 +125,8 @@ export const Workspace: React.FC<WorkspaceProps> = (props) => {
     isContentGenerated 
   } = props;
 
-  // Responsive width calculation: min 500px, max 785px
-  const [containerWidth, setContainerWidth] = useState(785);
+  // Responsive width calculation: min 500px, max 700px
+  const [containerWidth, setContainerWidth] = useState(700);
   
   useEffect(() => {
     const calculateWidth = () => {
@@ -135,8 +135,8 @@ export const Workspace: React.FC<WorkspaceProps> = (props) => {
       const padding = 80; // Account for workspace padding
       const availableWidth = viewportWidth - sidebarWidth - padding;
       
-      // Scale between 500px (minimum for small screens) and 785px (full)
-      const width = Math.min(785, Math.max(500, availableWidth));
+      // Scale between 500px (minimum for small screens) and 700px (full)
+      const width = Math.min(700, Math.max(500, availableWidth));
       setContainerWidth(width);
     };
     

@@ -814,8 +814,8 @@ export const App: React.FC = () => {
             {/* Unified Banner with Simple Text Labels */}
             <div className="bg-gray-50 border-b border-gray-200" style={{ height: '140px' }}>
                 <div className="flex flex-col h-full">
-                    {/* Simple Text Labels */}
-                    <div className="flex items-center pt-2 px-4">
+                    {/* Simple Text Labels - moved up 3px */}
+                    <div className="flex items-center pt-1 px-4">
                         <button
                             onClick={() => setBannerTab('uploads')}
                             className={`text-xs font-medium uppercase tracking-wider transition-colors ${
@@ -844,8 +844,8 @@ export const App: React.FC = () => {
                         </button>
                     </div>
                     
-                    {/* Content Area */}
-                    <div className="flex-1 px-4 pt-2 pb-3">
+                    {/* Content Area - moved left 2px */}
+                    <div className="flex-1 pt-1 pb-3" style={{ paddingLeft: '14px', paddingRight: '16px' }}>
                         <div className="flex gap-3 overflow-x-auto h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                             {bannerTab === 'uploads' ? (
                                 <>

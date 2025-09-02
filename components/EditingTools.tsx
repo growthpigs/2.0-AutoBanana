@@ -37,7 +37,7 @@ export const EditingTools: React.FC<EditingToolsProps> = ({
   onNewVariation, 
   lastGenerationParams,
   isDisabled = false,
-  containerWidth = 785
+  containerWidth = 700
 }) => {
   const [adjustmentInput, setAdjustmentInput] = useState('');
   const [showImageMenu, setShowImageMenu] = useState(false);
