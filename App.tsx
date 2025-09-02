@@ -991,13 +991,7 @@ export const App: React.FC = () => {
                 </main>
             </div>
             
-            {/* Footer with yellow sidebar column */}
-            <div className="flex">
-                <div className="bg-yellow-50" style={{ width: '520px' }}></div>
-                <div className="flex-grow">
-                    <Footer />
-                </div>
-            </div>
+            <Footer />
 
             {/* Loading Indicators */}
             {isAnalyzing && <AnalysisLoader />}
