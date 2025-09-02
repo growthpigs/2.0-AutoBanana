@@ -179,7 +179,7 @@ export const App: React.FC = () => {
     }, [smartInput]);
 
     const handleGenerateDescription = useCallback(async () => {
-        console.log('🔍 CRITICAL: handleGenerateDescription called');
+        console.log('🔍 CRITICAL: handleGenerateDescription called - performing FULL AI ANALYSIS');
         console.log('📸 selectedImage check:', selectedImage ? 
             `Present: ${selectedImage.file.name} (${selectedImage.file.size} bytes)` : 'NULL - PROBLEM!');
         
@@ -191,21 +191,77 @@ export const App: React.FC = () => {
         setIsDescriptionLoading(true);
         setError(null);
         try {
-            console.log('📝 Calling describeImage with file:', {
+            console.log('🤖 Performing AI product analysis with file:', {
                 name: selectedImage.file.name,
                 size: selectedImage.file.size,
-                type: selectedImage.file.type
+                type: selectedImage.file.type,
+                title: smartInput.title || 'Untitled',
+                description: smartInput.description || ''
             });
-            const desc = await describeImage(selectedImage.file);
-            console.log('✅ Description SUCCESS:', desc);
-            setImageDescription(desc);
+            
+            // Perform full AI analysis including industry and audience detection
+            const analysis = await analyzeProduct(
+                selectedImage.file,
+                smartInput.title || '',
+                smartInput.description || ''
+            );
+            
+            console.log('✅ AI Analysis SUCCESS:', analysis);
+            
+            if (analysis) {
+                // Update the selected image with analysis
+                const updatedImage = {
+                    ...selectedImage,
+                    analysis: analysis,
+                    smartInput: {
+                        ...smartInput,
+                        title: analysis.suggestedTitle || smartInput.title,
+                        description: analysis.userStory || smartInput.description,
+                        industry: analysis.detectedIndustry || smartInput.industry,
+                        targetAudience: analysis.recommendedAudiences?.[0] || smartInput.targetAudience,
+                        analysis: analysis,
+                        isAnalysisConfirmed: false
+                    }
+                };
+                
+                // Update image library
+                setUploadedImages(prev => 
+                    prev.map(img => img.id === selectedImage.id ? updatedImage : img)
+                );
+                setSelectedImage(updatedImage);
+                
+                // Update smart input with analysis results
+                setSmartInput({
+                    ...smartInput,
+                    title: analysis.suggestedTitle || smartInput.title,
+                    description: analysis.userStory || smartInput.description,
+                    industry: analysis.detectedIndustry || smartInput.industry,
+                    targetAudience: analysis.recommendedAudiences?.[0] || smartInput.targetAudience,
+                    analysis: analysis,
+                    isAnalysisConfirmed: false
+                });
+                
+                // Set description for backwards compatibility
+                setImageDescription(analysis.userStory || smartInput.description);
+                
+                toast.success('🍌 AI analysis complete! Review and adjust as needed.');
+            }
         } catch (e: any) {
-            console.error('❌ Description FAILED:', e);
-            setError(e.message || 'Failed to generate description.');
+            console.error('❌ Analysis FAILED:', e);
+            // Fallback to simple description if full analysis fails
+            try {
+                const desc = await describeImage(selectedImage.file);
+                setImageDescription(desc);
+                setSmartInput({ ...smartInput, description: desc });
+                toast.success('Description generated (analysis unavailable)');
+            } catch (fallbackError) {
+                setError(e.message || 'Failed to analyze image.');
+                toast.error('Failed to analyze image');
+            }
         } finally {
             setIsDescriptionLoading(false);
         }
-    }, [selectedImage]);
+    }, [selectedImage, smartInput]);
 
     useEffect(() => {
         console.log('👀 CRITICAL: selectedImage effect triggered');
@@ -216,11 +272,9 @@ export const App: React.FC = () => {
             type: selectedImage.file.type
         } : 'NULL');
         
-        if (selectedImage) {
-            console.log('🚀 Auto-triggering description generation...');
-            handleGenerateDescription();
-        } else {
-            console.log('⚠️ ALERT: selectedImage is null, skipping description');
+        // Don't auto-trigger analysis - let user control when it happens
+        if (selectedImage && !selectedImage.analysis) {
+            console.log('📌 Image selected without analysis - user can click Analyze button');
         }
     }, [selectedImage, handleGenerateDescription]);
 

@@ -148,11 +148,11 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                   <div className="text-center">
                     <div className="text-sm text-gray-600 mb-2">No analysis available</div>
                     <button
-                      onClick={() => onReanalyze()}
-                      disabled={!hasImage || isLoading}
+                      onClick={() => onGenerateDescription()}
+                      disabled={!hasImage || isLoading || isDescriptionLoading}
                       className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-md disabled:opacity-50"
                     >
-                      Analyze Image
+                      {isDescriptionLoading ? 'Analyzing...' : 'Analyze Image'}
                     </button>
                   </div>
                 )}

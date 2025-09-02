@@ -339,50 +339,36 @@ export const analyzeProduct = async (imageFile: File, productTitle: string, prod
     try {
         const imagePart = await fileToGenerativePart(imageFile);
         
-        const prompt = `Analyze this uploaded image carefully and provide smart marketing insights.
+        // Shorter, more focused prompt for faster response
+        const prompt = `Analyze this product image for marketing. Be fast and accurate.
 
-FIRST, describe EXACTLY what you see in the image:
-- Visual style (is it digital art, photography, 3D render, illustration, logo, UI/UX design?)
-- Artistic elements (colors, composition, style, technique)
-- Subject matter (what is depicted or represented)
-- Any text or branding visible
+What I see in the image:
+- Product type and visual style
+- Key features and colors
 
-BASED ON YOUR VISUAL ANALYSIS, determine the most appropriate category:
+Based on the image, provide:
+1. Industry category (choose from: saas, ecommerce, fashion, food_beverage, fitness_wellness, technology, b2b_services, automotive, real_estate, education, healthcare, finance, entertainment, travel, home_garden)
+2. Two target audiences (from: entrepreneurs, gen_z, millennials, busy_professionals, parents, students, corporate_buyers, fitness_enthusiasts, tech_savvy, luxury_consumers, budget_conscious, early_adopters, creative_professionals, artists_designers, content_creators, homeowners)
+3. Nine specific locations where this would be used (like "modern office desk", "coffee shop table", "kitchen counter", "rooftop terrace", "cozy reading nook", "outdoor garden table", "bedroom nightstand", "city park bench", "home studio workspace")
+4. Brief description of what's in the image
 
-IMPORTANT INDUSTRY DETECTION RULES:
-- If the image shows digital art, illustrations, or creative designs → "entertainment" industry
-- If it's a logo or brand identity → match to the brand's actual industry
-- If it's UI/UX mockups or app screenshots → "saas" or "technology" 
-- If it shows physical products → match to product category
-- NEVER default to "technology" unless it's actual tech hardware or software UI
-
-1. What industry/category this belongs to (be specific and accurate)
-2. Who the target audiences should be (analyze the specific product type and suggest the most relevant audiences - for kitchen items: homeowners, parents, budget_conscious; for tech: tech_savvy, early_adopters, millennials; for fitness: fitness_enthusiasts, busy_professionals; be product-specific)
-3. Natural environments where this product would realistically be placed or used (be specific about physical locations)
-4. A brief, factual description of the actual visual content
-5. Your confidence level (0-100)
-
-CRITICAL: For naturalEnvironments, provide SPECIFIC PHYSICAL LOCATIONS where this product would actually be used or displayed:
-- For apps/software: "modern office desk", "coffee shop workspace", "home office", "co-working space"
-- For physical products: "kitchen counter", "living room table", "outdoor patio", "bedroom nightstand"
-- For fashion items: "urban street corner", "rooftop terrace", "beach boardwalk", "city park"
-- For art/creative: "art studio easel", "gallery wall", "designer's desk", "creative loft space"
-
-Return a valid JSON object with this structure:
+Return JSON:
 {
-  "suggestedTitle": "accurate title - for art use: 'Digital Art Creation' or similar",
-  "detectedIndustry": "one of: saas, ecommerce, fashion, food_beverage, fitness_wellness, technology, b2b_services, automotive, real_estate, education, healthcare, finance, entertainment, travel, home_garden",
-  "recommendedAudiences": ["array of exactly 2 most relevant and different audiences based on the actual product - choose from: entrepreneurs, gen_z, millennials, busy_professionals, parents, students, corporate_buyers, fitness_enthusiasts, tech_savvy, luxury_consumers, budget_conscious, early_adopters, creative_professionals, artists_designers, content_creators, homeowners"],
-  "naturalEnvironments": ["array of exactly 9 SPECIFIC PHYSICAL LOCATIONS like 'modern office desk', 'coffee shop table', 'kitchen counter', 'rooftop terrace', 'cozy reading nook', 'outdoor garden table', 'bedroom nightstand', 'city park bench', 'home studio workspace'"],
-  "userStory": "A factual description of the visual elements, style, and artistic technique visible in the image",
-  "confidence": 85
+  "suggestedTitle": "short product title",
+  "detectedIndustry": "industry_name",
+  "recommendedAudiences": ["audience1", "audience2"],
+  "naturalEnvironments": ["location1", "location2", "location3", "location4", "location5", "location6", "location7", "location8", "location9"],
+  "userStory": "Brief description of the product",
+  "confidence": 90
 }`;
 
         const response = await getAi().models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-2.0-flash-exp', // Use the fastest model
             contents: { parts: [imagePart, { text: prompt }] },
             config: {
                 responseMimeType: "application/json",
+                temperature: 0.3, // Lower temperature for faster, more consistent results
+                maxOutputTokens: 500, // Limit output for speed
             },
         });
 
