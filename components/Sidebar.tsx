@@ -96,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     };
 
     return (
-        <aside className="w-96 bg-white/80 backdrop-blur-lg border-r border-gray-200 p-6 flex flex-col space-y-6 overflow-y-auto">
+        <aside className="w-96 bg-white/80 backdrop-blur-lg border-r border-gray-200 p-6 flex flex-col space-y-6 overflow-y-auto" style={{ minWidth: '384px' }}>
             {/* Image Library */}
             <div className="space-y-3">
                 <h2 className="text-lg font-bold text-gray-800">Image Library</h2>
@@ -234,7 +234,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <button 
                 onClick={handleGenerateClick}
                 disabled={isLoading || !selectedFormat}
-                className="w-full mt-auto text-center py-2.5 px-4 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed"
+                className="w-full text-center py-3 px-6 rounded-lg bg-green-500 border-2 border-yellow-400 text-white font-semibold hover:bg-green-600 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:bg-green-300 disabled:cursor-not-allowed"
+                style={{ marginTop: '25px' }}
             >
                 {isLoading ? 'Generating...' : 'Generate Mockup'}
             </button>

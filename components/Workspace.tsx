@@ -1,5 +1,4 @@
-import React from 'react';
-import { ImageIcon, WarningIcon } from './Icons';
+import React, { useState, useEffect } from 'react';
 import { EditingTools } from './EditingTools';
 // FIX: Import LastGenerationParams to use in props.
 import { LoadingState, LastGenerationParams } from '../App';
@@ -87,6 +86,26 @@ const ErrorState: React.FC<{ error: string }> = ({ error }) => {
 export const Workspace: React.FC<WorkspaceProps> = (props) => {
   const { loadingState, generatedContent, error, isContentGenerated, isRepositionMode, onRepositionClick, sessionGallery, onSelectFromGallery } = props;
 
+  // Responsive width calculation: min 650px (middle ground), max 785px
+  const [containerWidth, setContainerWidth] = useState(785);
+  
+  useEffect(() => {
+    const calculateWidth = () => {
+      const viewportWidth = window.innerWidth;
+      const sidebarWidth = 400;
+      const padding = 80;
+      const availableWidth = viewportWidth - sidebarWidth - padding;
+      
+      // Scale between 650px (middle ground) and 785px (full)
+      const width = Math.min(785, Math.max(650, availableWidth));
+      setContainerWidth(width);
+    };
+    
+    calculateWidth();
+    window.addEventListener('resize', calculateWidth);
+    return () => window.removeEventListener('resize', calculateWidth);
+  }, []);
+
   const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
     if (!isRepositionMode || !generatedContent || 'headline' in generatedContent) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -135,7 +154,7 @@ export const Workspace: React.FC<WorkspaceProps> = (props) => {
         </div>
         
         {isContentGenerated && (
-             <EditingTools {...props} />
+             <EditingTools {...props} containerWidth={containerWidth} />
         )}
 
         {sessionGallery.length > 0 && (

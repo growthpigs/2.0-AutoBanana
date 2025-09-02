@@ -20,6 +20,7 @@ interface EditingToolsProps {
   onRegenerateText: () => void;
   onNewVariation: () => void;
   lastGenerationParams: LastGenerationParams | null;
+  containerWidth?: number;
 }
 
 const TABS = ['Adjust', 'Reposition'];
