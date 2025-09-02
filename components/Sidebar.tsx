@@ -153,8 +153,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Image Library Section */}
 
-      {/* Tab Content */}
-      <div ref={contentRef} className="overflow-y-auto p-3" style={{ height: '380px', minHeight: '380px', maxHeight: '380px' }}>
+      {/* Tab Content - Flexible height */}
+      <div ref={contentRef} className="flex-1 overflow-y-auto p-3">
         {activeTab === 'custom' && (
           <div className="space-y-3">
             {/* AI Analysis Status */}
@@ -363,8 +363,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       </div>
 
-      {/* Bottom Action Buttons - Now in normal flow with 25px margin */}
-      <div ref={buttonsRef} className="p-3 flex gap-2 bg-yellow-50" style={{ marginTop: '25px', alignItems: 'center', flexShrink: 0 }}>
+      {/* Bottom Action Buttons - Always 30px below content */}
+      <div ref={buttonsRef} className="p-3 flex gap-2 bg-yellow-50" style={{ marginTop: '30px' }}>
         <button
           onClick={() => {
             if (activeTab === 'custom' && selectedEnvironment) {
