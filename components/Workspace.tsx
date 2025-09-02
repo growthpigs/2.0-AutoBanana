@@ -177,8 +177,8 @@ export const Workspace: React.FC<WorkspaceProps> = (props) => {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Main Content Area - Square container for image with tools directly below */}
-      <div className="flex-1 flex items-start justify-start p-8 bg-white">
-        <div className="flex flex-col items-center">
+      <div className="flex-1 flex items-start justify-start bg-white" style={{ paddingTop: '30px', paddingLeft: '30px', paddingRight: '30px', paddingBottom: '30px' }}>
+        <div className="flex flex-col items-start">
           {/* Square Image Container */}
           <div className="aspect-square rounded-lg overflow-hidden" style={{ width: `${containerWidth}px` }}>
             {renderContent()}

@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const facebookCount = FACEBOOK_AD_FORMATS.length;
 
   return (
-    <div className="flex flex-col h-full bg-yellow-50 border-r border-gray-300/30 w-96">
+    <div className="flex flex-col h-full bg-yellow-50 border-r border-gray-300/30" style={{ width: '400px' }}>
       {/* Tabs */}
       <div className="flex bg-gray-100 border-b border-gray-200/10">
         <button
