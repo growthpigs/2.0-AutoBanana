@@ -151,8 +151,75 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
       </div>
 
+      {/* Image Library Section */}
+      <div className="border-b border-gray-200/80 p-3 bg-white">
+        <div className="space-y-3">
+          {/* Uploads Section */}
+          <div>
+            <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">UPLOADS</h3>
+            <div className="grid grid-cols-4 gap-2">
+              {imageLibrary.slice(0, 3).map(image => (
+                <button
+                  key={image.id}
+                  onClick={() => onSelectFromLibrary(image)}
+                  className={`aspect-square rounded-lg overflow-hidden border-2 transition-all hover:scale-105 ${
+                    selectedImage?.id === image.id 
+                      ? 'border-yellow-500 shadow-lg' 
+                      : 'border-gray-200/80 hover:border-gray-300/80'
+                  }`}
+                >
+                  <img src={image.url} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+              <label 
+                htmlFor="sidebar-file-upload"
+                className="aspect-square rounded-lg border-2 border-dashed border-gray-300/80 flex items-center justify-center cursor-pointer hover:border-gray-400/80 transition-colors bg-gray-50"
+              >
+                <input
+                  id="sidebar-file-upload"
+                  type="file"
+                  className="hidden"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        if (typeof reader.result === 'string') {
+                          onImageUpload(file, reader.result);
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                    e.target.value = '';
+                  }}
+                />
+                <PlusIcon className="w-6 h-6 text-gray-400" />
+              </label>
+            </div>
+          </div>
+
+          {/* Generations Section */}
+          {generatedGallery.length > 0 && (
+            <div>
+              <h3 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-2">GENERATIONS</h3>
+              <div className="grid grid-cols-4 gap-2">
+                {generatedGallery.slice(0, 4).map((item, index) => (
+                  <button
+                    key={index}
+                    className="aspect-square rounded-lg overflow-hidden border border-gray-200/80 hover:border-gray-300/80 transition-all hover:scale-105"
+                  >
+                    <img src={item.imageUrl || '/placeholder.png'} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Tab Content */}
-      <div ref={contentRef} className="overflow-y-auto p-3" style={{ height: '520px', minHeight: '520px', maxHeight: '520px' }}>
+      <div ref={contentRef} className="overflow-y-auto p-3" style={{ height: '380px', minHeight: '380px', maxHeight: '380px' }}>
         {activeTab === 'custom' && (
           <div className="space-y-3">
             {/* AI Analysis Status */}
