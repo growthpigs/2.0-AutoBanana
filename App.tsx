@@ -6,10 +6,10 @@ import { generateAdMockup, generateSlogan, editImage, describeImage, generateFac
 import { generateMockAnalysis, generateNaturalEnvironmentPrompt, getNaturalEnvironmentFormat } from './services/mockIntelligence';
 import { AD_FORMATS } from './constants';
 import ImageUploader from './components/ImageUploader';
-import { Header } from './components/Header';
+import { ProfessionalHeader } from './components/ProfessionalHeader';
 import { Footer } from './components/Footer';
-import { Sidebar } from './components/Sidebar';
-import { Workspace } from './components/Workspace';
+import { ProfessionalSidebar } from './components/ProfessionalSidebar';
+import { ProfessionalWorkspace } from './components/ProfessionalWorkspace';
 import { AnalysisCompleteNotification } from './components/AnalysisCompleteNotification';
 import { PlusIcon } from './components/Icons';
 import { AnalysisLoader } from './components/AnalysisLoader';
@@ -43,7 +43,6 @@ export const App: React.FC = () => {
     const [history, setHistory] = useState<(GeneratedContent | null)[]>([]);
     const [currentHistoryIndex, setCurrentHistoryIndex] = useState(-1);
     const [sessionGallery, setSessionGallery] = useState<GeneratedContent[]>([]);
-    const [bannerTab, setBannerTab] = useState<'uploads' | 'generations'>('uploads');
     const [lastGenerationParams, setLastGenerationParams] = useState<LastGenerationParams | null>(null);
     const [selectedFormat, setSelectedFormat] = useState<AdFormat | null>(null);
     const [selectedSloganType, setSelectedSloganType] = useState<SloganType | null>(null);
@@ -352,7 +351,6 @@ export const App: React.FC = () => {
                 const newContent: MockupContent = { imageUrl: result.imageUrl, slogan };
                 updateHistory(newContent);
                 setSessionGallery(prev => [newContent, ...prev].slice(0, 16));
-                setBannerTab('generations'); // Auto-switch to generations tab
             } catch (e: any) {
                 setError(e.message || 'Failed to generate natural environment mockup.');
                 updateHistory(null);
@@ -387,7 +385,6 @@ export const App: React.FC = () => {
                 const newContent: MockupContent = { imageUrl: result.imageUrl, slogan };
                 updateHistory(newContent);
                 setSessionGallery(prev => [newContent, ...prev].slice(0, 16));
-                setBannerTab('generations'); // Auto-switch to generations tab
             } else if (format.type === 'facebook') {
                 setLoadingState('generating_text');
                 const fbContent = await generateFacebookAdContent(format, description);
@@ -809,151 +806,30 @@ export const App: React.FC = () => {
     }
     
     return (
-        <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#fefcf0' }}>
-            <Header />
+        <div className="flex flex-col min-h-screen bg-white">
+            <ProfessionalHeader />
             
-            {/* Unified Banner with Simple Text Labels */}
-            <div className="bg-gray-50 border-b border-gray-200" style={{ height: '136px' }}>
-                <div className="flex flex-col h-full">
-                    {/* Simple Text Labels - moved up 3px */}
-                    <div className="flex items-center pt-1 px-4">
-                        <button
-                            onClick={() => setBannerTab('uploads')}
-                            className={`text-xs font-medium uppercase tracking-wider transition-colors ${
-                                bannerTab === 'uploads'
-                                    ? 'text-gray-700'
-                                    : 'text-gray-400 hover:text-gray-600'
-                            }`}
-                        >
-                            UPLOADS
-                        </button>
-                        <div className="mx-2.5 h-3 w-px bg-gray-300/50"></div>
-                        <button
-                            onClick={() => setBannerTab('generations')}
-                            className={`text-xs font-medium uppercase tracking-wider transition-colors ${
-                                bannerTab === 'generations'
-                                    ? 'text-gray-700'
-                                    : 'text-gray-400 hover:text-gray-600'
-                            }`}
-                        >
-                            GENERATIONS
-                            {sessionGallery.length > 0 && (
-                                <span className="ml-2 bg-yellow-400 text-gray-900 px-1.5 py-0.5 rounded-full text-[10px] font-bold">
-                                    {sessionGallery.length}
-                                </span>
-                            )}
-                        </button>
-                    </div>
-                    
-                    {/* Content Area - moved left 2px */}
-                    <div className="flex-1 pt-1 pb-3" style={{ paddingLeft: '14px', paddingRight: '16px' }}>
-                        <div className="flex gap-3 overflow-x-auto h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                            {bannerTab === 'uploads' ? (
-                                <>
-                                    {/* Upload button */}
-                                    <label 
-                                        htmlFor="unified-file-upload"
-                                        className="w-25 h-25 flex-shrink-0 bg-white rounded-lg flex items-center justify-center cursor-pointer border-2 border-dashed border-gray-300 hover:border-gray-400 hover:bg-gray-100 transition-colors"
-                                        aria-label="Upload new image"
-                                    >
-                                        <PlusIcon className="w-6 h-6 text-gray-400" />
-                                        <input
-                                            id="unified-file-upload"
-                                            type="file"
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file && file.type.startsWith('image/')) {
-                                                    const reader = new FileReader();
-                                                    reader.onloadend = () => {
-                                                        if (typeof reader.result === 'string') {
-                                                            handleImageUpload(file, reader.result);
-                                                        }
-                                                    };
-                                                    reader.readAsDataURL(file);
-                                                }
-                                                e.target.value = '';
-                                            }}
-                                            className="hidden"
-                                            accept="image/png, image/jpeg, image/webp"
-                                            disabled={loadingState !== 'idle'}
-                                        />
-                                    </label>
-                                    
-                                    {/* Uploaded images */}
-                                    {uploadedImages.map(image => (
-                                        <div key={image.id} className="relative group flex-shrink-0">
-                                            <button 
-                                                onClick={() => handleSelectFromLibrary(image)}
-                                                className={`w-25 h-25 rounded-lg overflow-hidden border-2 transition-all ${
-                                                    selectedImage?.id === image.id 
-                                                        ? 'border-yellow-500 ring-2 ring-yellow-200' 
-                                                        : 'border-gray-200 hover:border-gray-300'
-                                                }`}
-                                                aria-label="Select product image"
-                                            >
-                                                <img src={image.previewUrl} alt="Product" className="w-full h-full object-cover" />
-                                            </button>
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleDeleteFromLibrary(image.id);
-                                                }}
-                                                className="absolute top-1 right-1 bg-gray-600 bg-opacity-80 text-white rounded w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-gray-700"
-                                                aria-label="Delete image"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ))}
-                                </>
-                            ) : (
-                                <>
-                                    {/* Generated images */}
-                                    {sessionGallery.length === 0 ? (
-                                        <div className="w-25 h-25 flex-shrink-0 bg-white rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
-                                            <span className="text-xs text-gray-400">No generations yet</span>
-                                        </div>
-                                    ) : (
-                                        sessionGallery.map((content, index) => (
-                                            <button
-                                                key={index}
-                                                onClick={() => handleSelectFromGallery(content)}
-                                                className="w-25 h-25 flex-shrink-0 rounded-lg overflow-hidden border-2 border-gray-200 hover:border-yellow-500 focus:border-yellow-500 transition-all"
-                                                aria-label={`Select generation ${index + 1}`}
-                                            >
-                                                <img src={content.imageUrl} alt={`Generation ${index + 1}`} className="w-full h-full object-cover" />
-                                            </button>
-                                        ))
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </div>
             
             <div className="flex-grow flex">
-                {/* Yellow sidebar column that extends to footer */}
-                <div className="bg-yellow-50" style={{ width: '520px' }}>
-                    <Sidebar
-                        imageLibrary={uploadedImages}
-                        generatedGallery={sessionGallery}
-                        selectedImage={selectedImage}
-                        onSelectFromLibrary={handleSelectFromLibrary}
-                        onDeleteFromLibrary={handleDeleteFromLibrary}
-                        onGenerate={handleGenerate}
-                        isLoading={isLoading || isAnalyzing}
-                        smartInput={smartInput}
-                        onSmartInputChange={handleSmartInputChange}
-                        isDescriptionLoading={isDescriptionLoading}
-                        onImageUpload={handleImageUpload}
-                        onGenerateDescription={handleGenerateDescription}
-                        selectedSloganType={selectedSloganType}
-                        onSelectSloganType={setSelectedSloganType}
-                        onResetAnalysis={handleResetAnalysis}
-                        onReanalyze={handleReanalyze}
-                    />
-                </div>
+                {/* Professional sidebar */}
+                <ProfessionalSidebar
+                    imageLibrary={uploadedImages}
+                    generatedGallery={sessionGallery}
+                    selectedImage={selectedImage}
+                    onSelectFromLibrary={handleSelectFromLibrary}
+                    onDeleteFromLibrary={handleDeleteFromLibrary}
+                    onGenerate={handleGenerate}
+                    isLoading={isLoading || isAnalyzing}
+                    smartInput={smartInput}
+                    onSmartInputChange={handleSmartInputChange}
+                    isDescriptionLoading={isDescriptionLoading}
+                    onImageUpload={handleImageUpload}
+                    onGenerateDescription={handleGenerateDescription}
+                    selectedSloganType={selectedSloganType}
+                    onSelectSloganType={setSelectedSloganType}
+                    onResetAnalysis={handleResetAnalysis}
+                    onReanalyze={handleReanalyze}
+                />
                 <main className="flex-grow flex flex-col bg-white">
                     {/* Generation Progress - only show when not using full-screen loader */}
                     {loadingState !== 'generating_image' && loadingState !== 'generating_text' && (
@@ -964,31 +840,18 @@ export const App: React.FC = () => {
                         />
                     )}
                     
-                    <Workspace
-                                loadingState={loadingState}
-                                generatedContent={generatedContent}
-                                error={error}
-                                onEdit={handleEdit}
-                                onUndo={handleUndo}
-                                onRedo={handleRedo}
-                                onReset={handleReset}
-                                onUploadNew={handleUploadNew}
-                                canUndo={canUndo}
-                                canRedo={canRedo}
-                                isContentGenerated={isContentGenerated}
-                                isLoading={isLoading}
-                                isRepositionMode={isRepositionMode}
-                                onToggleRepositionMode={handleToggleRepositionMode}
-                                onRepositionClick={handleRepositionClick}
-                                onRegenerateImage={handleRegenerateImage}
-                                onRegenerateText={handleRegenerateText}
-                                onNewVariation={handleNewVariation}
-                                sessionGallery={sessionGallery}
-                                onSelectFromGallery={handleSelectFromGallery}
-                                onFacebookAdTextChange={handleFacebookAdTextChange}
-                                onImageUpload={handleImageUpload}
-                                lastGenerationParams={lastGenerationParams}
-                            />
+                    <ProfessionalWorkspace
+                        content={generatedContent}
+                        isLoading={loadingState !== 'idle'}
+                        onEditPrompt={handleEdit}
+                        onRegenerateImage={handleRegenerateImage}
+                        onRegenerateText={handleRegenerateText}
+                        onNewVariation={handleNewVariation}
+                        sessionGallery={sessionGallery}
+                        onSelectFromGallery={handleSelectFromGallery}
+                        onFacebookAdTextChange={handleFacebookAdTextChange}
+                        onImageUpload={handleImageUpload}
+                    />
                 </main>
             </div>
             
