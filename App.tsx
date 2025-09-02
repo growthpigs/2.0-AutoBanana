@@ -931,25 +931,28 @@ export const App: React.FC = () => {
                 </div>
             </div>
             
-            <div className="flex-grow flex bg-white">
-                <Sidebar
-                    imageLibrary={uploadedImages}
-                    generatedGallery={sessionGallery}
-                    selectedImage={selectedImage}
-                    onSelectFromLibrary={handleSelectFromLibrary}
-                    onDeleteFromLibrary={handleDeleteFromLibrary}
-                    onGenerate={handleGenerate}
-                    isLoading={isLoading || isAnalyzing}
-                    smartInput={smartInput}
-                    onSmartInputChange={handleSmartInputChange}
-                    isDescriptionLoading={isDescriptionLoading}
-                    onImageUpload={handleImageUpload}
-                    onGenerateDescription={handleGenerateDescription}
-                    selectedSloganType={selectedSloganType}
-                    onSelectSloganType={setSelectedSloganType}
-                    onResetAnalysis={handleResetAnalysis}
-                    onReanalyze={handleReanalyze}
-                />
+            <div className="flex-grow flex">
+                {/* Yellow sidebar column that extends to footer */}
+                <div className="bg-yellow-50" style={{ width: '520px' }}>
+                    <Sidebar
+                        imageLibrary={uploadedImages}
+                        generatedGallery={sessionGallery}
+                        selectedImage={selectedImage}
+                        onSelectFromLibrary={handleSelectFromLibrary}
+                        onDeleteFromLibrary={handleDeleteFromLibrary}
+                        onGenerate={handleGenerate}
+                        isLoading={isLoading || isAnalyzing}
+                        smartInput={smartInput}
+                        onSmartInputChange={handleSmartInputChange}
+                        isDescriptionLoading={isDescriptionLoading}
+                        onImageUpload={handleImageUpload}
+                        onGenerateDescription={handleGenerateDescription}
+                        selectedSloganType={selectedSloganType}
+                        onSelectSloganType={setSelectedSloganType}
+                        onResetAnalysis={handleResetAnalysis}
+                        onReanalyze={handleReanalyze}
+                    />
+                </div>
                 <main className="flex-grow flex flex-col bg-white">
                     {/* Generation Progress - only show when not using full-screen loader */}
                     {loadingState !== 'generating_image' && loadingState !== 'generating_text' && (
@@ -988,7 +991,13 @@ export const App: React.FC = () => {
                 </main>
             </div>
             
-            <Footer />
+            {/* Footer with yellow sidebar column */}
+            <div className="flex">
+                <div className="bg-yellow-50" style={{ width: '520px' }}></div>
+                <div className="flex-grow">
+                    <Footer />
+                </div>
+            </div>
 
             {/* Loading Indicators */}
             {isAnalyzing && <AnalysisLoader />}

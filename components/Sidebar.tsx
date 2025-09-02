@@ -126,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col h-full bg-yellow-50 border-r border-gray-300/30" style={{ width: '520px' }}>
+    <div className="flex flex-col h-full w-full border-r border-gray-300/30">
       {/* Tabs */}
       <div className="flex bg-gray-100 border-b border-gray-200/10">
         <button
@@ -398,7 +398,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}
           disabled={!hasImage || isLoading || (activeTab !== 'custom' && selectedFormats.length === 0)}
           style={{ opacity: !hasImage ? 0.5 : 1 }}
-          className="max-w-2xl mx-auto px-12 py-3 text-base font-semibold text-white bg-green-500 border-2 border-yellow-400/80 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="w-full max-w-md mx-auto px-16 py-2 text-base font-semibold text-white bg-green-500 border-2 border-yellow-400/80 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <span className="flex items-center justify-center gap-2">
             <SparklesIcon className="w-5 h-5" />
