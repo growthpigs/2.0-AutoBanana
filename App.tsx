@@ -905,11 +905,6 @@ export const App: React.FC = () => {
                         onSelectFromGallery={handleSelectFromGallery}
                         onFacebookAdTextChange={handleFacebookAdTextChange}
                         onImageUpload={handleImageUpload}
-                        onUndo={handleUndo}
-                        onRedo={handleRedo}
-                        onReset={handleReset}
-                        canUndo={canUndo}
-                        canRedo={canRedo}
                         lastGenerationParams={lastGenerationParams}
                     />
                 </main>

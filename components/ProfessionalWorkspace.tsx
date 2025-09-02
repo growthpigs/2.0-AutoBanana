@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { GeneratedContent, FacebookAdContent } from '../types';
-import { Download, Share2, Sparkles, Type, Image, Plus, ChevronDown, Send, RotateCcw, Redo } from 'lucide-react';
+import { Download, Share2, Sparkles, Type, Image, Plus, ChevronDown, Send } from 'lucide-react';
 import { LastGenerationParams } from '../App';
 
 interface ProfessionalWorkspaceProps {
@@ -14,11 +14,6 @@ interface ProfessionalWorkspaceProps {
   onSelectFromGallery: (content: GeneratedContent) => void;
   onFacebookAdTextChange: (newContent: Partial<FacebookAdContent>) => void;
   onImageUpload: (file: File, previewUrl: string) => void;
-  onUndo?: () => void;
-  onRedo?: () => void;
-  onReset?: () => void;
-  canUndo?: boolean;
-  canRedo?: boolean;
   lastGenerationParams?: LastGenerationParams | null;
 }
 
@@ -96,10 +91,6 @@ const CreativeCanvas: React.FC<{
   onRegenerateText?: () => void;
   onNewVariation?: () => void;
   onImageUpload?: (file: File, previewUrl: string) => void;
-  onUndo?: () => void;
-  onRedo?: () => void;
-  canUndo?: boolean;
-  canRedo?: boolean;
   lastGenerationParams?: LastGenerationParams | null;
   isLoading?: boolean;
 }> = ({ 
@@ -110,10 +101,6 @@ const CreativeCanvas: React.FC<{
   onRegenerateText,
   onNewVariation,
   onImageUpload,
-  onUndo,
-  onRedo,
-  canUndo = false,
-  canRedo = false,
   lastGenerationParams,
   isLoading = false
 }) => {
@@ -123,60 +110,60 @@ const CreativeCanvas: React.FC<{
 
   return (
     <div className="flex-1 flex flex-col bg-gray-50">
-      {/* Canvas Toolbar - Matching height with sidebar tabs */}
+      {/* Canvas Toolbar - Single row with tools and chat inline */}
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-        <div className="flex items-center gap-2">
-          {/* Editing Tools */}
+        <div className="flex items-center gap-1">
+          {/* Editing Tools - Compact */}
           <button
             onClick={onNewVariation}
             disabled={isLoading}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             title="New Variation"
           >
-            <Sparkles className="w-4 h-4" />
-            <span>New Variation</span>
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Variation</span>
           </button>
           
           <button
             onClick={onRegenerateText}
             disabled={isLoading || !lastGenerationParams}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             title="New Text"
           >
-            <Type className="w-4 h-4" />
-            <span>New Text</span>
+            <Type className="w-3.5 h-3.5" />
+            <span>Text</span>
           </button>
           
           <button
             onClick={onRegenerateImage}
             disabled={isLoading}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             title="New Image"
           >
-            <Image className="w-4 h-4" />
-            <span>New Image</span>
+            <Image className="w-3.5 h-3.5" />
+            <span>Image</span>
           </button>
 
-          {/* Add Image Dropdown */}
+          {/* Add Image Dropdown - Compact */}
           <div className="relative">
             <button
               onClick={() => setShowImageMenu(!showImageMenu)}
               disabled={isLoading}
-              className="flex items-center gap-1 px-3 py-2 text-sm text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-3.5 h-3.5" />
               <span>Add</span>
-              <ChevronDown className="w-3 h-3" />
+              <ChevronDown className="w-2.5 h-2.5" />
             </button>
             
             {showImageMenu && (
-              <div className="absolute left-0 top-full mt-1 w-40 bg-white border border-gray-200/80 rounded-lg shadow-lg z-10">
+              <div className="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-200/80 rounded-lg shadow-lg z-10">
                 <button
                   onClick={() => {
                     setShowImageMenu(false);
                     onEditPrompt('Merge the uploaded image with the current image, blending them naturally');
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
                 >
                   Merge Images
                 </button>
@@ -185,7 +172,7 @@ const CreativeCanvas: React.FC<{
                     setShowImageMenu(false);
                     onEditPrompt('Replace the main product with the new uploaded image while keeping the same style');
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
                 >
                   Swap Product
                 </button>
@@ -194,7 +181,7 @@ const CreativeCanvas: React.FC<{
                     setShowImageMenu(false);
                     onEditPrompt('Overlay the new image on top of the current image as a layer');
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
                 >
                   Overlay Image
                 </button>
@@ -204,84 +191,53 @@ const CreativeCanvas: React.FC<{
                     setShowImageMenu(false);
                     fileInputRef.current?.click();
                   }}
-                  className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
                 >
                   Upload New
                 </button>
               </div>
             )}
           </div>
+        </div>
 
-          <div className="h-6 w-px bg-gray-200/80 mx-2" />
-
-          {/* History Controls */}
-          <button
-            onClick={onUndo}
-            disabled={!canUndo || isLoading}
-            className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="Undo"
-          >
-            <RotateCcw className="w-4 h-4" />
-          </button>
-          
-          <button
-            onClick={onRedo}
-            disabled={!canRedo || isLoading}
-            className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="Redo"
-          >
-            <Redo className="w-4 h-4" />
-          </button>
+        {/* Chat Input - Inline on the right */}
+        <div className="flex-1 max-w-lg mx-4">
+          <form onSubmit={(e) => {
+            e.preventDefault();
+            if (chatInput.trim() && !isLoading) {
+              onEditPrompt(chatInput);
+              setChatInput('');
+            }
+          }} className="relative">
+            <input
+              type="text"
+              value={chatInput}
+              onChange={(e) => setChatInput(e.target.value)}
+              placeholder="Describe changes (e.g., 'make it brighter', 'add sunset background')"
+              className="w-full px-3 pr-10 py-1.5 text-sm border border-gray-300/80 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-400"
+              style={{ backgroundColor: '#fafafa' }}
+              disabled={isLoading}
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !chatInput.trim()}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-500 hover:text-yellow-600 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </form>
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
             <Share2 className="w-4 h-4" />
             Share
           </button>
-          <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800">
+          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800">
             <Download className="w-4 h-4" />
             Export
           </button>
         </div>
-      </div>
-
-      {/* Chat Input Bar */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <form onSubmit={(e) => {
-          e.preventDefault();
-          if (chatInput.trim() && !isLoading) {
-            onEditPrompt(chatInput);
-            setChatInput('');
-          }
-        }} className="relative">
-          <textarea
-            value={chatInput}
-            onChange={(e) => setChatInput(e.target.value)}
-            placeholder="Describe changes (e.g., 'make it brighter', 'add sunset background', 'change to summer theme')"
-            className="w-full px-4 pr-16 py-3 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-400 resize-none"
-            style={{ backgroundColor: '#fafafa' }}
-            disabled={isLoading}
-            rows={2}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                if (chatInput.trim() && !isLoading) {
-                  onEditPrompt(chatInput);
-                  setChatInput('');
-                }
-              }
-            }}
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !chatInput.trim()}
-            className="absolute right-6 p-2.5 text-gray-500 hover:text-yellow-600 disabled:opacity-30 disabled:cursor-not-allowed"
-            style={{ top: '50%', transform: 'translateY(-50%)' }}
-          >
-            <Send className="w-5 h-5" />
-          </button>
-        </form>
       </div>
 
       {/* Hidden file input for image upload */}
@@ -368,11 +324,6 @@ export const ProfessionalWorkspace: React.FC<ProfessionalWorkspaceProps> = ({
   onSelectFromGallery,
   onFacebookAdTextChange,
   onImageUpload,
-  onUndo,
-  onRedo,
-  onReset,
-  canUndo,
-  canRedo,
   lastGenerationParams
 }) => {
   if (isLoading) {
@@ -400,10 +351,6 @@ export const ProfessionalWorkspace: React.FC<ProfessionalWorkspaceProps> = ({
         onRegenerateText={onRegenerateText}
         onNewVariation={onNewVariation}
         onImageUpload={onImageUpload}
-        onUndo={onUndo}
-        onRedo={onRedo}
-        canUndo={canUndo}
-        canRedo={canRedo}
         lastGenerationParams={lastGenerationParams}
         isLoading={isLoading}
       />

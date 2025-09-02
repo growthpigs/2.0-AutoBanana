@@ -14,8 +14,21 @@ import {
     InstagramIcon, TikTokIcon2, PinterestIcon, DiscordIcon, ShoppingIcon, VideoIcon
 } from './components/NewIcons';
 
+// 🚨🚨🚨 CRITICAL: SQUARE OUTPUT REQUIREMENT 🚨🚨🚨
+export const SQUARE_OUTPUT_REQUIREMENT = `
+🟦 ABSOLUTE MANDATORY RULE: ALL GENERATED IMAGES MUST BE PERFECTLY SQUARE (1024x1024)
+- Output dimensions: EXACTLY 1024 x 1024 pixels
+- Aspect ratio: 1:1 (square)
+- Shape: SQUARE - never rectangular, wide, or tall
+- Instagram/social media format
+- If input is not square, add padding/letterboxing
+- This rule CANNOT be overridden for any reason
+- Width MUST equal Height in all cases
+`;
+
 export const DESIGN_RULES = `
 IMPORTANT DESIGN RULES:
+0.  **SQUARE OUTPUT MANDATORY**: ${SQUARE_OUTPUT_REQUIREMENT}
 1.  **Image Containment**: The user's uploaded product image MUST be placed within a container, frame, or designated area. It must NEVER go edge-to-edge on the final generated image. There must always be padding or a background visible around it.
 2.  **Text Placement**: ALL text (slogans, captions, headlines) MUST be placed OUTSIDE the user's product image area. Do NOT overlay any text directly on top of the product image itself. Text should be in its own designated space (e.g., a header, footer, or colored block).
 3.  **Font Style**: Use modern, clean, sans-serif fonts for all text unless explicitly told otherwise. Text should be highly legible.

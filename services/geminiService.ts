@@ -123,16 +123,26 @@ export const generateAdMockup = async (imageFile: File, basePrompt: string, slog
     const qualityNote = `IMPORTANT: Create a professional, high-quality mockup suitable for commercial use. Focus on clean, tasteful promotional material with excellent composition and lighting.`;
     
     const aspectRatioRequirement = `
-    🚨🚨🚨 ABSOLUTE MANDATORY SQUARE OUTPUT REQUIREMENT 🚨🚨🚨
-    - CRITICAL: Output image MUST be perfectly square (1:1 aspect ratio) - NO EXCEPTIONS
-    - EXACT DIMENSIONS: Width = Height (e.g., 1024x1024, 512x512, 768x768)
-    - If input is rectangular, ADD PADDING (letterbox/pillarbox) to make it square
-    - NEVER preserve the original aspect ratio of the input - ALWAYS force square
-    - Think Instagram post format - ALWAYS 1:1 square like all social media posts
-    - Width and height must be IDENTICAL in final output
-    - This is NON-NEGOTIABLE - square output is REQUIRED regardless of input format
-    - REJECT any attempt to output wide/tall images - FORCE SQUARE ALWAYS
-    - Add background/padding if needed to achieve perfect 1:1 ratio
+    🚨🚨🚨 ABSOLUTE MANDATORY: OUTPUT MUST BE 1024x1024 SQUARE 🚨🚨🚨
+    
+    CRITICAL REQUIREMENT - THIS IS THE #1 PRIORITY:
+    ⬜ OUTPUT DIMENSIONS: EXACTLY 1024 x 1024 pixels
+    ⬜ ASPECT RATIO: PERFECTLY SQUARE (1:1)
+    ⬜ SHAPE: SQUARE - NOT RECTANGULAR, NOT WIDE, NOT TALL
+    
+    HOW TO ACHIEVE THIS:
+    1. If the input image is not square, CENTER it and ADD PADDING
+    2. Use letterboxing (top/bottom bars) for wide images
+    3. Use pillarboxing (side bars) for tall images
+    4. The padding can be blurred background, solid color, or gradient
+    5. NEVER crop important parts - always add padding instead
+    
+    THIS IS NON-NEGOTIABLE:
+    - Instagram format: 1:1 square
+    - Social media standard: 1024x1024
+    - Width MUST equal Height
+    - If you output anything other than a perfect square, it is a FAILURE
+    - IGNORE any aspect ratio from the input - FORCE SQUARE OUTPUT
     `;
 
     const fullPrompt = `${imagePreservationPrompt}
@@ -165,6 +175,10 @@ export const generateAdMockup = async (imageFile: File, basePrompt: string, slog
       },
       config: {
         responseModalities: [Modality.IMAGE, Modality.TEXT],
+        temperature: 0.1, // Very low for consistent square output
+        candidateCount: 1,
+        topP: 0.8,
+        topK: 20,
       },
     });
 
@@ -241,7 +255,22 @@ export const editImage = async (imageDataUrl: string, editPrompt: string): Promi
     
     try {
         const imagePart = await dataUrlToGenerativePart(imageDataUrl);
-        const textPart = { text: `${editPrompt}. 🚨🚨🚨 MANDATORY: The final output image must be perfectly square (1:1 aspect ratio). If the current image is not square, ADD PADDING or CROP to make it square. Width and height must be identical. This is NON-NEGOTIABLE - square output is required regardless of input format.` };
+        const textPart = { text: `${editPrompt}. 
+        
+        🚨🚨🚨 ABSOLUTE MANDATORY: OUTPUT MUST BE 1024x1024 SQUARE 🚨🚨🚨
+        
+        CRITICAL REQUIREMENT - THIS IS THE #1 PRIORITY:
+        ⬜ OUTPUT DIMENSIONS: EXACTLY 1024 x 1024 pixels
+        ⬜ ASPECT RATIO: PERFECTLY SQUARE (1:1)
+        ⬜ SHAPE: SQUARE - NOT RECTANGULAR
+        
+        If the current image is not square:
+        1. CENTER it and ADD PADDING around it
+        2. Use letterboxing or pillarboxing as needed
+        3. NEVER crop important content - always add padding
+        4. The final output MUST be a perfect square
+        
+        Width MUST equal Height - this is NON-NEGOTIABLE.` };
 
         const response = await getAi().models.generateContent({
             model: 'gemini-2.5-flash-image-preview',
