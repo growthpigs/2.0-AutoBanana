@@ -90,7 +90,7 @@ const InitialState: React.FC<{ onImageUpload: (file: File, previewUrl: string) =
     <label 
       htmlFor="workspace-file-upload"
       className="flex flex-col items-center justify-center w-full h-full border-2 border-dashed border-gray-300/80 rounded-lg cursor-pointer hover:border-gray-400/80 transition-colors"
-      style={{ backgroundColor: '#fafafa' }}
+      style={{ backgroundColor: 'white' }}
       onDragOver={onDragOver}
       onDrop={onDrop}
     >
@@ -177,7 +177,7 @@ export const Workspace: React.FC<WorkspaceProps> = (props) => {
   return (
     <div className="flex flex-col h-full bg-white">
       {/* Main Content Area - Square container for image with tools directly below */}
-      <div className="flex-1 flex items-start justify-start p-8">
+      <div className="flex-1 flex items-start justify-start p-8 bg-white">
         <div className="flex flex-col items-center">
           {/* Square Image Container */}
           <div className="aspect-square rounded-lg overflow-hidden" style={{ width: `${containerWidth}px` }}>
