@@ -811,27 +811,28 @@ export const App: React.FC = () => {
         <div className="flex flex-col min-h-screen" style={{ backgroundColor: '#fefcf0' }}>
             <Header />
             
-            {/* Unified Banner with Tab System */}
+            {/* Unified Banner with Simple Text Labels */}
             <div className="bg-gray-50 border-b border-gray-200" style={{ height: '140px' }}>
-                <div className="flex h-full">
-                    {/* Tab Headers */}
-                    <div className="flex items-start pt-3 px-4 gap-2">
+                <div className="flex flex-col h-full">
+                    {/* Simple Text Labels */}
+                    <div className="flex items-center pt-2 px-4">
                         <button
                             onClick={() => setBannerTab('uploads')}
-                            className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider rounded-t-lg transition-colors ${
+                            className={`text-xs font-medium uppercase tracking-wider transition-colors ${
                                 bannerTab === 'uploads'
-                                    ? 'bg-white text-gray-900 border-t border-l border-r border-gray-200'
-                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-50'
+                                    ? 'text-gray-700'
+                                    : 'text-gray-400 hover:text-gray-600'
                             }`}
                         >
                             UPLOADS
                         </button>
+                        <div className="mx-2.5 h-3 w-px bg-gray-300/50"></div>
                         <button
                             onClick={() => setBannerTab('generations')}
-                            className={`px-3 py-1.5 text-xs font-medium uppercase tracking-wider rounded-t-lg transition-colors ${
+                            className={`text-xs font-medium uppercase tracking-wider transition-colors ${
                                 bannerTab === 'generations'
-                                    ? 'bg-white text-gray-900 border-t border-l border-r border-gray-200'
-                                    : 'bg-gray-100 text-gray-500 hover:bg-gray-50'
+                                    ? 'text-gray-700'
+                                    : 'text-gray-400 hover:text-gray-600'
                             }`}
                         >
                             GENERATIONS
@@ -843,9 +844,9 @@ export const App: React.FC = () => {
                         </button>
                     </div>
                     
-                    {/* Tab Content */}
-                    <div className="flex-1 px-4 py-3">
-                        <div className="flex gap-3 overflow-x-auto pb-2 h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+                    {/* Content Area */}
+                    <div className="flex-1 px-4 pt-2 pb-3">
+                        <div className="flex gap-3 overflow-x-auto h-full scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                             {bannerTab === 'uploads' ? (
                                 <>
                                     {/* Upload button */}
