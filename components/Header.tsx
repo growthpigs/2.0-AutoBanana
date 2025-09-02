@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const Header: React.FC = () => (
-  <header className="sticky top-0 z-20 border-b" style={{ height: '64px', backgroundColor: '#FACC15', borderColor: '#FDE047' }}>
+  <header className="sticky top-0 z-20 border-b" style={{ height: '64px', backgroundColor: '#F1F600', borderColor: '#FDE047' }}>
     <div className="h-full flex items-center justify-between" style={{ paddingLeft: '26px', paddingRight: '20px' }}>
       <img 
         src="/autobanana-logo-final.svg" 
