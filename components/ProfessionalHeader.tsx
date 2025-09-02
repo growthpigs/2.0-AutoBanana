@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
 import { Search, Bell, ChevronDown, Settings, User, LogOut, Plus } from 'lucide-react';
 
-export const ProfessionalHeader: React.FC = () => {
+interface ProfessionalHeaderProps {
+  activeSection?: string;
+  onSectionChange?: (section: string) => void;
+}
+
+export const ProfessionalHeader: React.FC<ProfessionalHeaderProps> = ({ 
+  activeSection = 'overview',
+  onSectionChange 
+}) => {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showProjectMenu, setShowProjectMenu] = useState(false);
 
@@ -26,7 +34,11 @@ export const ProfessionalHeader: React.FC = () => {
             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
           >
             <div className="w-6 h-6 bg-yellow-400 rounded flex items-center justify-center">
-              <span className="text-xs font-bold text-gray-900">🍌</span>
+              <img 
+                src="/AutoBanana/Auto-logoMark.svg" 
+                alt="AutoBanana" 
+                className="w-4 h-4"
+              />
             </div>
             <span>autobanana</span>
             <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -39,7 +51,11 @@ export const ProfessionalHeader: React.FC = () => {
               </div>
               <button className="w-full flex items-center gap-3 px-3 py-2 text-sm text-gray-900 hover:bg-gray-50">
                 <div className="w-6 h-6 bg-yellow-400 rounded flex items-center justify-center">
-                  <span className="text-xs font-bold text-gray-900">🍌</span>
+                  <img 
+                    src="/AutoBanana/Auto-logoMark.svg" 
+                    alt="AutoBanana" 
+                    className="w-4 h-4"
+                  />
                 </div>
                 <div className="flex-1 text-left">
                   <div className="font-medium">autobanana</div>
@@ -58,18 +74,24 @@ export const ProfessionalHeader: React.FC = () => {
 
         {/* Navigation Tabs */}
         <nav className="flex items-center gap-1">
-          <button className="px-3 py-2 text-sm font-medium text-gray-900 bg-gray-100 rounded-md">
-            Overview
-          </button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors">
-            Analytics
-          </button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors">
-            Templates
-          </button>
-          <button className="px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors">
-            Settings
-          </button>
+          {[
+            { id: 'overview', name: 'Overview' },
+            { id: 'analytics', name: 'Analytics' },
+            { id: 'templates', name: 'Templates' },
+            { id: 'settings', name: 'Settings' }
+          ].map((section) => (
+            <button 
+              key={section.id}
+              onClick={() => onSectionChange?.(section.id)}
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                activeSection === section.id
+                  ? 'text-gray-900 bg-gray-100'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}
+            >
+              {section.name}
+            </button>
+          ))}
         </nav>
       </div>
 

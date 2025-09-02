@@ -10,6 +10,9 @@ import { ProfessionalHeader } from './components/ProfessionalHeader';
 import { Footer } from './components/Footer';
 import { ProfessionalSidebar } from './components/ProfessionalSidebar';
 import { ProfessionalWorkspace } from './components/ProfessionalWorkspace';
+import { AnalyticsDashboard } from './components/AnalyticsDashboard';
+import { TemplatesLibrary } from './components/TemplatesLibrary';
+import { SettingsPanel } from './components/SettingsPanel';
 import { AnalysisCompleteNotification } from './components/AnalysisCompleteNotification';
 import { PlusIcon } from './components/Icons';
 import { AnalysisLoader } from './components/AnalysisLoader';
@@ -46,6 +49,7 @@ export const App: React.FC = () => {
     const [lastGenerationParams, setLastGenerationParams] = useState<LastGenerationParams | null>(null);
     const [selectedFormat, setSelectedFormat] = useState<AdFormat | null>(null);
     const [selectedSloganType, setSelectedSloganType] = useState<SloganType | null>(null);
+    const [activeSection, setActiveSection] = useState<string>('overview');
     
     // Smart Analysis State
     const [smartInput, setSmartInput] = useState<SmartProductInput>({
@@ -807,52 +811,66 @@ export const App: React.FC = () => {
     
     return (
         <div className="flex flex-col min-h-screen bg-white">
-            <ProfessionalHeader />
+            <ProfessionalHeader 
+                activeSection={activeSection}
+                onSectionChange={setActiveSection}
+            />
             
             
             <div className="flex-grow flex">
-                {/* Professional sidebar */}
-                <ProfessionalSidebar
-                    imageLibrary={uploadedImages}
-                    generatedGallery={sessionGallery}
-                    selectedImage={selectedImage}
-                    onSelectFromLibrary={handleSelectFromLibrary}
-                    onDeleteFromLibrary={handleDeleteFromLibrary}
-                    onGenerate={handleGenerate}
-                    isLoading={isLoading || isAnalyzing}
-                    smartInput={smartInput}
-                    onSmartInputChange={handleSmartInputChange}
-                    isDescriptionLoading={isDescriptionLoading}
-                    onImageUpload={handleImageUpload}
-                    onGenerateDescription={handleGenerateDescription}
-                    selectedSloganType={selectedSloganType}
-                    onSelectSloganType={setSelectedSloganType}
-                    onResetAnalysis={handleResetAnalysis}
-                    onReanalyze={handleReanalyze}
-                />
-                <main className="flex-grow flex flex-col bg-white">
-                    {/* Generation Progress - only show when not using full-screen loader */}
-                    {loadingState !== 'generating_image' && loadingState !== 'generating_text' && (
-                        <GenerationProgress 
-                            loadingState={loadingState}
-                            isNaturalEnvironment={isNaturalEnvironmentSelected}
-                            selectedFormatName={selectedFormat?.name}
+                {/* Conditional rendering based on active section */}
+                {activeSection === 'analytics' ? (
+                    <AnalyticsDashboard />
+                ) : activeSection === 'templates' ? (
+                    <TemplatesLibrary />
+                ) : activeSection === 'settings' ? (
+                    <SettingsPanel />
+                ) : (
+                    <>
+                        {/* Professional sidebar - only show for overview */}
+                        <ProfessionalSidebar
+                            imageLibrary={uploadedImages}
+                            generatedGallery={sessionGallery}
+                            selectedImage={selectedImage}
+                            onSelectFromLibrary={handleSelectFromLibrary}
+                            onDeleteFromLibrary={handleDeleteFromLibrary}
+                            onGenerate={handleGenerate}
+                            isLoading={isLoading || isAnalyzing}
+                            smartInput={smartInput}
+                            onSmartInputChange={handleSmartInputChange}
+                            isDescriptionLoading={isDescriptionLoading}
+                            onImageUpload={handleImageUpload}
+                            onGenerateDescription={handleGenerateDescription}
+                            selectedSloganType={selectedSloganType}
+                            onSelectSloganType={setSelectedSloganType}
+                            onResetAnalysis={handleResetAnalysis}
+                            onReanalyze={handleReanalyze}
                         />
-                    )}
-                    
-                    <ProfessionalWorkspace
-                        content={generatedContent}
-                        isLoading={loadingState !== 'idle'}
-                        onEditPrompt={handleEdit}
-                        onRegenerateImage={handleRegenerateImage}
-                        onRegenerateText={handleRegenerateText}
-                        onNewVariation={handleNewVariation}
-                        sessionGallery={sessionGallery}
-                        onSelectFromGallery={handleSelectFromGallery}
-                        onFacebookAdTextChange={handleFacebookAdTextChange}
-                        onImageUpload={handleImageUpload}
-                    />
-                </main>
+                        <main className="flex-grow flex flex-col bg-white">
+                            {/* Generation Progress - only show when not using full-screen loader */}
+                            {loadingState !== 'generating_image' && loadingState !== 'generating_text' && (
+                                <GenerationProgress 
+                                    loadingState={loadingState}
+                                    isNaturalEnvironment={isNaturalEnvironmentSelected}
+                                    selectedFormatName={selectedFormat?.name}
+                                />
+                            )}
+                            
+                            <ProfessionalWorkspace
+                                content={generatedContent}
+                                isLoading={loadingState !== 'idle'}
+                                onEditPrompt={handleEdit}
+                                onRegenerateImage={handleRegenerateImage}
+                                onRegenerateText={handleRegenerateText}
+                                onNewVariation={handleNewVariation}
+                                sessionGallery={sessionGallery}
+                                onSelectFromGallery={handleSelectFromGallery}
+                                onFacebookAdTextChange={handleFacebookAdTextChange}
+                                onImageUpload={handleImageUpload}
+                            />
+                        </main>
+                    </>
+                )}
             </div>
             
             <Footer />

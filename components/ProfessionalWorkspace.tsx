@@ -53,11 +53,11 @@ const EmptyState: React.FC<{ onImageUpload: (file: File, previewUrl: string) => 
         onDragOver={(e) => e.preventDefault()}
       >
         <div className="mb-4">
-          <div className="w-16 h-16 mx-auto mb-4 bg-[#F1F600] rounded-full flex items-center justify-center p-2">
+          <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
             <img 
-              src="/banana-loading-trimmed.gif" 
-              alt="AutoBanana Loading" 
-              className="w-full h-full object-contain"
+              src="/AutoBanana/Auto-logoMark.svg" 
+              alt="AutoBanana" 
+              className="w-8 h-8 opacity-60"
             />
           </div>
         </div>
