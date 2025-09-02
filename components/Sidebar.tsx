@@ -152,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </div>
 
       {/* Tab Content */}
-      <div ref={contentRef} className="overflow-y-auto p-3" style={{ minHeight: '500px', maxHeight: 'calc(100vh - 260px)' }}>
+      <div ref={contentRef} className="overflow-y-auto p-3" style={{ height: '520px', minHeight: '520px', maxHeight: '520px' }}>
         {activeTab === 'custom' && (
           <div className="space-y-3">
             {/* AI Analysis Status */}
@@ -307,13 +307,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div>
               <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Text (Optional)</label>
               <p className="text-xs text-gray-400 ml-1" style={{ marginBottom: '6px', marginTop: '-4px' }}>AI will create an appropriate phrase and add it to the image</p>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-1.5">
                 {sloganTypes.map((type) => (
                   <button
                     key={type.id}
                     onClick={() => onSelectSloganType(selectedSloganType === type.id ? null : type.id)}
                     disabled={!hasImage}
-                    className={`p-2 text-xs font-medium uppercase rounded-lg border transition-all ${
+                    className={`px-2 py-1.5 text-[10px] font-medium uppercase rounded-lg border transition-all ${
                       selectedSloganType === type.id
                         ? 'border-yellow-500/80 bg-yellow-50 text-gray-900'
                         : `border-gray-300/80 ${!hasImage ? 'bg-yellow-50' : 'bg-white'} text-gray-700 hover:border-gray-400/80`
