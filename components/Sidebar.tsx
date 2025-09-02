@@ -105,8 +105,28 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const socialCount = SOCIAL_MEDIA_FORMATS.length;
   const facebookCount = FACEBOOK_AD_FORMATS.length;
 
+  // Diagnostic logging for sidebar width calculations
+  React.useEffect(() => {
+    const sidebarWidth = 520;
+    const padding = 24; // p-3 = 12px * 2
+    const availableWidth = sidebarWidth - padding;
+    const gaps = 36; // gap-3 with 4 columns = 3 gaps * 12px
+    const boxSpace = availableWidth - gaps;
+    const perBox = boxSpace / 4;
+    
+    console.log('🔧 SIDEBAR WIDTH DIAGNOSTICS:');
+    console.log(`   Sidebar width: ${sidebarWidth}px`);
+    console.log(`   Padding (p-3): ${padding}px`);
+    console.log(`   Available width: ${availableWidth}px`);
+    console.log(`   Grid gaps: ${gaps}px`);
+    console.log(`   Space for 4 boxes: ${boxSpace}px`);
+    console.log(`   Per box width: ${perBox}px`);
+    console.log(`   Target per box: ~115px`);
+    console.log(`   Status: ${perBox >= 115 ? '✅ GOOD' : '❌ TOO NARROW'}`);
+  }, []);
+
   return (
-    <div className="flex flex-col h-full bg-yellow-50 border-r border-gray-300/30" style={{ width: '400px' }}>
+    <div className="flex flex-col h-full bg-yellow-50 border-r border-gray-300/30" style={{ width: '520px' }}>
       {/* Tabs */}
       <div className="flex bg-gray-100 border-b border-gray-200/10">
         <button
@@ -378,7 +398,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}
           disabled={!hasImage || isLoading || (activeTab !== 'custom' && selectedFormats.length === 0)}
           style={{ opacity: !hasImage ? 0.5 : 1 }}
-          className="w-full px-6 py-3 text-base font-semibold text-white bg-green-500 border-2 border-yellow-400/80 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="max-w-xs mx-auto px-6 py-3 text-base font-semibold text-white bg-green-500 border-2 border-yellow-400/80 rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           <span className="flex items-center justify-center gap-2">
             <SparklesIcon className="w-5 h-5" />
