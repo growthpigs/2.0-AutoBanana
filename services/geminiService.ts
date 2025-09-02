@@ -250,6 +250,90 @@ export const generateSlogan = async (imageFile: File, sloganType: SloganType): P
     }
 };
 
+// Multi-image merge function for combining two images
+export const mergeImages = async (
+    primaryImageDataUrl: string, 
+    secondaryImageDataUrl: string, 
+    mergePrompt: string
+): Promise<GeneratedAdResult> => {
+    console.log('Starting multi-image merge with gemini-2.5-flash-image-preview...');
+    
+    try {
+        const primaryImagePart = await dataUrlToGenerativePart(primaryImageDataUrl);
+        const secondaryImagePart = await dataUrlToGenerativePart(secondaryImageDataUrl);
+        
+        const textPart = { text: `${mergePrompt}
+
+🚨🚨🚨 ABSOLUTE MANDATORY: OUTPUT MUST BE 1024x1024 SQUARE 🚨🚨🚨
+
+CRITICAL REQUIREMENT - THIS IS THE #1 PRIORITY:
+⬜ OUTPUT DIMENSIONS: EXACTLY 1024 x 1024 pixels
+⬜ ASPECT RATIO: Perfect 1:1 square
+⬜ If input images are not square, add letterboxing/pillarboxing with appropriate background
+
+DESIGN REQUIREMENTS:
+${DESIGN_RULES}
+
+INPUT IMAGES:
+- First image: Primary/base image to work with
+- Second image: Secondary image to merge/combine
+
+MERGE INSTRUCTIONS:
+${mergePrompt}
+
+Create a professional, high-quality merged image that combines both input images according to the instructions. Maintain the quality and detail of both source images while creating a cohesive final result.` };
+
+        console.log('🖼️ MERGE DEBUG: Both images provided as imageParts');
+        
+        // Pass both images and the prompt using the same API pattern as editImage
+        const response = await getAi().models.generateContent({
+            model: 'gemini-2.5-flash-image-preview',
+            contents: {
+                parts: [primaryImagePart, secondaryImagePart, textPart],
+            },
+            config: {
+                responseModalities: [Modality.IMAGE, Modality.TEXT],
+            },
+        });
+        
+        if (response.promptFeedback?.blockReason) {
+          throw new Error(`Merge request blocked due to ${response.promptFeedback.blockReason}.`);
+        }
+        if (!response.candidates || response.candidates.length === 0) {
+          throw new Error('Image merge failed. The model returned no candidates, possibly due to safety filters.');
+        }
+
+        let imageUrl: string | null = null;
+        const candidate = response.candidates[0];
+
+        if (candidate.content && candidate.content.parts) {
+          const imagePartFromResponse = candidate.content.parts.find(part => !!part.inlineData);
+          if (imagePartFromResponse?.inlineData) {
+              const base64ImageBytes: string = imagePartFromResponse.inlineData.data;
+              imageUrl = `data:${imagePartFromResponse.inlineData.mimeType};base64,${base64ImageBytes}`;
+              console.log('✅ Multi-image merge successful!');
+          }
+        }
+        
+        if (!imageUrl) {
+            const textResponse = response.text;
+            const finishReason = candidate.finishReason;
+            throw new Error(`Multi-image merge failed. Reason: ${finishReason}. Response: ${textResponse}`);
+        }
+
+        return { 
+            imageUrl, 
+            text: response.text || 'Images merged successfully'
+        };
+    } catch (error: any) {
+        console.error('❌ Multi-image merge failed:', error);
+        if (error.message?.includes('SAFETY')) {
+            throw new Error('The merge request was blocked for safety reasons. Try adjusting your merge instructions.');
+        }
+        throw new Error(error.message || 'Multi-image merge failed');
+    }
+};
+
 export const editImage = async (imageDataUrl: string, editPrompt: string): Promise<GeneratedAdResult> => {
     console.log('Starting image editing with gemini-2.5-flash-image-preview...');
     

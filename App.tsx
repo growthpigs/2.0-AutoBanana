@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import { AdFormat, SloganType, UploadedImage, FacebookAdContent, GeneratedContent, MockupContent, SmartProductInput } from './types';
-import { generateAdMockup, generateSlogan, editImage, describeImage, generateFacebookAdContent, analyzeProduct } from './services/geminiService';
+import { generateAdMockup, generateSlogan, editImage, describeImage, generateFacebookAdContent, analyzeProduct, mergeImages } from './services/geminiService';
 import { generateMockAnalysis, generateNaturalEnvironmentPrompt, getNaturalEnvironmentFormat } from './services/mockIntelligence';
 import { AD_FORMATS } from './constants';
 import ImageUploader from './components/ImageUploader';
@@ -177,6 +177,88 @@ export const App: React.FC = () => {
             // Continue without analysis - user can still generate manually
         }
     }, [smartInput]);
+
+    // Separate handler for merge uploads that doesn't trigger analysis popup
+    const handleMergeImageUpload = useCallback(async (file: File, previewUrl: string) => {
+        console.log('🔀 MERGE UPLOAD: Image upload for merge operation');
+        
+        const newImage: UploadedImage = {
+            id: `merge-${file.name}-${new Date().getTime()}`,
+            file,
+            previewUrl,
+            name: file.name,
+        };
+        
+        // Add to uploaded images without triggering analysis
+        setUploadedImages(prev => [newImage, ...prev]);
+        
+        // Don't set as selected image or trigger analysis - this is just for merging
+        console.log('✅ Merge image ready for processing');
+        
+    }, []);
+
+    // Handler for multi-image merge operations
+    const handleImageMerge = useCallback(async (secondImageFile: File, secondImagePreview: string, mergeType: string, customInstructions: string) => {
+        const currentContent = history[currentHistoryIndex];
+        if (!currentContent || !currentContent.imageUrl) {
+            toast.error('No current image to merge with');
+            return;
+        }
+        
+        setError(null);
+        setLoadingState('editing');
+        
+        try {
+            // Create detailed prompt based on merge type and custom instructions
+            let prompt = '';
+            switch (mergeType) {
+                case 'overlay':
+                    prompt = 'Overlay the second image on top of the first image as a layer, maintaining both images\' visual elements';
+                    break;
+                case 'side-by-side':
+                    prompt = 'Place the first image and second image side by side horizontally in the same frame, creating a split composition';
+                    break;
+                case 'blend':
+                    prompt = 'Seamlessly blend the first image with the second image, creating a natural fusion of both images';
+                    break;
+                case 'replace-product':
+                    prompt = 'Replace the main product in the first image with the product/object from the second image while maintaining the same style and environment';
+                    break;
+                case 'background-merge':
+                    prompt = 'Use the second image as background elements while keeping the first image\'s main subject as the focus';
+                    break;
+                case 'composite':
+                    prompt = 'Create an artistic composite image combining both the first image and second image in a creative, professional way';
+                    break;
+                default:
+                    prompt = 'Merge the first image with the second image in a visually appealing way';
+            }
+            
+            if (customInstructions.trim()) {
+                prompt += `. Additional instructions: ${customInstructions.trim()}`;
+            }
+            
+            console.log('🔀 Starting multi-image merge with prompt:', prompt);
+            
+            // Use the new mergeImages function with both image data
+            const result = await mergeImages(currentContent.imageUrl, secondImagePreview, prompt);
+            
+            if (!result.imageUrl) throw new Error("Image merge failed to return an image URL.");
+            
+            // Preserve other properties of the content object
+            const newContent: GeneratedContent = { ...currentContent, imageUrl: result.imageUrl };
+            updateHistory(newContent);
+            setSessionGallery(prev => [newContent, ...prev].slice(0, 16));
+            
+            toast.success('🎉 Images merged successfully!');
+            
+        } catch (e: any) {
+            setError(e.message || 'Failed to merge images.');
+            toast.error('🍌 Merge slipped up! Try again with different instructions.');
+        } finally {
+            setLoadingState('idle');
+        }
+    }, [history, currentHistoryIndex]);
 
     const handleGenerateDescription = useCallback(async () => {
         console.log('🔍 CRITICAL: handleGenerateDescription called - performing FULL AI ANALYSIS');
@@ -487,6 +569,7 @@ export const App: React.FC = () => {
             // Preserve other properties of the content object
             const newContent: GeneratedContent = { ...currentContent, imageUrl: result.imageUrl };
             updateHistory(newContent);
+            setSessionGallery(prev => [newContent, ...prev].slice(0, 16));
         } catch (e: any) {
             setError(e.message || 'Failed to edit image.');
         } finally {
@@ -886,7 +969,7 @@ export const App: React.FC = () => {
                 />
                 <main className="flex-grow flex flex-col bg-white">
                     {/* Generation Progress - only show when not using full-screen loader */}
-                    {loadingState !== 'generating_image' && loadingState !== 'generating_text' && (
+                    {loadingState !== 'generating_image' && loadingState !== 'generating_text' && loadingState !== 'editing' && (
                         <GenerationProgress 
                             loadingState={loadingState}
                             isNaturalEnvironment={isNaturalEnvironmentSelected}
@@ -905,6 +988,7 @@ export const App: React.FC = () => {
                         onSelectFromGallery={handleSelectFromGallery}
                         onFacebookAdTextChange={handleFacebookAdTextChange}
                         onImageUpload={handleImageUpload}
+                        onImageMerge={handleImageMerge}
                         lastGenerationParams={lastGenerationParams}
                     />
                 </main>
@@ -914,7 +998,7 @@ export const App: React.FC = () => {
 
             {/* Loading Indicators */}
             {isAnalyzing && <AnalysisLoader />}
-            {(loadingState === 'generating_image' || loadingState === 'generating_text') && <GenerationLoader />}
+            {(loadingState === 'generating_image' || loadingState === 'generating_text' || loadingState === 'editing') && <GenerationLoader />}
             
             {/* Production Status Panel for Multi-Format Generation */}
             <ProductionStatusPanel 

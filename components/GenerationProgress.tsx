@@ -50,12 +50,12 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
                 };
             case 'editing':
                 return {
-                    title: 'Editing Image',
-                    subtitle: 'Making your requested changes...',
+                    title: 'Blending Images',
+                    subtitle: 'Creating your merged masterpiece...',
                     steps: [
-                        { text: 'Processing edit request', active: true },
-                        { text: 'Applying changes', active: true },
-                        { text: 'Finalizing result', active: false }
+                        { text: 'Analyzing both images', active: true },
+                        { text: 'Applying blend instructions', active: true },
+                        { text: 'Finalizing merged result', active: false }
                     ]
                 };
             default:
