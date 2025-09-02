@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const facebookCount = FACEBOOK_AD_FORMATS.length;
 
   return (
-    <div className="flex flex-col h-full bg-yellow-50 border-r border-gray-300/30" style={{ width: '400px' }}>
+    <div className="flex flex-col h-full bg-yellow-50 border-r border-gray-300/30 w-96">
       {/* Tabs */}
       <div className="flex bg-gray-100 border-b border-gray-200/10">
         <button
@@ -210,49 +210,52 @@ export const Sidebar: React.FC<SidebarProps> = ({
               />
             </div>
 
-            {/* Industry */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Industry</label>
-              <div className="relative">
-                <select
-                  value={smartInput.industry || ''}
-                  onChange={(e) => onSmartInputChange({ ...smartInput, industry: e.target.value as any })}
-                  className={`w-full px-3 pr-10 py-1.5 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
-                >
-                  <option value="" className="text-gray-400">Select Industry</option>
-                  <option value="Entertainment & Media">Entertainment & Media</option>
-                  <option value="Technology">Technology</option>
-                  <option value="Fashion">Fashion</option>
-                  <option value="Food & Beverage">Food & Beverage</option>
-                  <option value="Health & Wellness">Health & Wellness</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+            {/* Industry and Target Audience - Side by Side */}
+            <div className="grid grid-cols-2 gap-2">
+              {/* Industry */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Industry</label>
+                <div className="relative">
+                  <select
+                    value={smartInput.industry || ''}
+                    onChange={(e) => onSmartInputChange({ ...smartInput, industry: e.target.value as any })}
+                    className={`w-full px-2 pr-8 py-1.5 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
+                  >
+                    <option value="" className="text-gray-400">Select</option>
+                    <option value="Entertainment & Media">Entertainment</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Fashion">Fashion</option>
+                    <option value="Food & Beverage">Food & Bev</option>
+                    <option value="Health & Wellness">Health</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Target Audience */}
-            <div>
-              <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Target Audience</label>
-              <div className="relative">
-                <select
-                  value={smartInput.targetAudience || ''}
-                  onChange={(e) => onSmartInputChange({ ...smartInput, targetAudience: e.target.value as any })}
-                  className={`w-full px-3 pr-10 py-1.5 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
-                >
-                  <option value="" className="text-gray-400">Select Audience</option>
-                  <option value="Gen Z (18-26)">Gen Z (18-26)</option>
-                  <option value="Millennials (27-42)">Millennials (27-42)</option>
-                  <option value="Gen X (43-58)">Gen X (43-58)</option>
-                  <option value="Boomers (59+)">Boomers (59+)</option>
-                </select>
-                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+              {/* Target Audience */}
+              <div>
+                <label className="block text-xs font-medium text-gray-600/40 ml-1 uppercase" style={{ fontFamily: 'JetBrains Mono', marginBottom: '2px' }}>Audience</label>
+                <div className="relative">
+                  <select
+                    value={smartInput.targetAudience || ''}
+                    onChange={(e) => onSmartInputChange({ ...smartInput, targetAudience: e.target.value as any })}
+                    className={`w-full px-2 pr-8 py-1.5 text-sm border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 appearance-none ${!hasImage ? 'bg-yellow-50' : 'bg-white'}`}
+                  >
+                    <option value="" className="text-gray-400">Select</option>
+                    <option value="Gen Z (18-26)">Gen Z</option>
+                    <option value="Millennials (27-42)">Millennials</option>
+                    <option value="Gen X (43-58)">Gen X</option>
+                    <option value="Boomers (59+)">Boomers</option>
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                    <svg className="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
               </div>
             </div>
