@@ -122,6 +122,7 @@ export const App: React.FC = () => {
         setError(null);
         setSessionGallery([]);
         setLastGenerationParams(null);
+        setLoadingState('idle'); // Clear any previous editing state
         console.log('✅ Image state set successfully');
         
         // Image uploaded successfully - provide feedback and start analysis
