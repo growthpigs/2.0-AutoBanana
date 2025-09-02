@@ -79,7 +79,7 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
   };
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
+    <div className="w-[420px] bg-white border-r border-gray-200 flex flex-col h-full">
       {/* Professional Tabs */}
       <div className="border-b border-gray-200">
         <nav className="flex">
@@ -169,7 +169,7 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                     type="text"
                     value={smartInput.title}
                     onChange={(e) => onSmartInputChange({ ...smartInput, title: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent"
                     placeholder="Enter product title"
                   />
                 </div>
@@ -180,7 +180,7 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                     <select
                       value={smartInput.industry || ''}
                       onChange={(e) => onSmartInputChange({ ...smartInput, industry: e.target.value as any })}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      className="w-full pl-3 pr-8 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 appearance-none bg-white bg-no-repeat bg-right bg-[length:12px] bg-[position:right_12px_center] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0iIzY5NzI4MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+')]"
                     >
                       <option value="">Select</option>
                       <option value="Entertainment & Media">Entertainment</option>
@@ -196,7 +196,7 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                     <select
                       value={smartInput.targetAudience || ''}
                       onChange={(e) => onSmartInputChange({ ...smartInput, targetAudience: e.target.value as any })}
-                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                      className="w-full pl-3 pr-8 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 appearance-none bg-white bg-no-repeat bg-right bg-[length:12px] bg-[position:right_12px_center] bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIiIGhlaWdodD0iOCIgdmlld0JveD0iMCAwIDEyIDgiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xIDFMNiA2TDExIDEiIHN0cm9rZT0iIzY5NzI4MCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KPC9zdmc+')]"
                     >
                       <option value="">Select</option>
                       <option value="Gen Z (18-26)">Gen Z</option>
@@ -212,7 +212,7 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                   <textarea
                     value={smartInput.description}
                     onChange={(e) => onSmartInputChange({ ...smartInput, description: e.target.value })}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"
+                    className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none leading-relaxed"
                     placeholder="Describe your product..."
                     rows={3}
                   />
@@ -266,41 +266,89 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
         )}
 
         {activeTab === 'formats' && (
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Ad Mockups</h3>
-              <FormatSelectionGrid
-                formats={AD_FORMATS}
-                selectedFormats={selectedFormats}
-                onToggleFormat={toggleFormat}
-                category="mockups"
-                getRecommendedFormats={() => []}
-                isFormatRecommended={() => false}
-              />
+          <div className="space-y-4">
+            {/* Ad Mockups Section */}
+            <div className="border border-gray-200 rounded-lg">
+              <div className="p-3 bg-gray-50">
+                <h3 className="text-sm font-semibold text-gray-900">Ad Mockups</h3>
+                <p className="text-xs text-gray-600 mt-0.5">{selectedFormats.filter(f => AD_FORMATS.includes(f)).length} selected</p>
+              </div>
+              <div className="p-3 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                {AD_FORMATS.map((format) => (
+                  <button
+                    key={format.id}
+                    onClick={() => toggleFormat(format)}
+                    className={`px-2 py-1.5 text-xs rounded-md border transition-all text-left ${
+                      selectedFormats.find(f => f.id === format.id)
+                        ? 'border-yellow-400 bg-yellow-50 text-gray-900'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs">{format.icon}</span>
+                      <div>
+                        <div className="font-medium leading-none text-[11px]">{format.name}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Social Media</h3>
-              <FormatSelectionGrid
-                formats={SOCIAL_MEDIA_FORMATS}
-                selectedFormats={selectedFormats}
-                onToggleFormat={toggleFormat}
-                category="social"
-                getRecommendedFormats={() => []}
-                isFormatRecommended={() => false}
-              />
+            {/* Social Media Section */}
+            <div className="border border-gray-200 rounded-lg">
+              <div className="p-3 bg-gray-50">
+                <h3 className="text-sm font-semibold text-gray-900">Social Media</h3>
+                <p className="text-xs text-gray-600 mt-0.5">{selectedFormats.filter(f => SOCIAL_MEDIA_FORMATS.includes(f)).length} selected</p>
+              </div>
+              <div className="p-3 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                {SOCIAL_MEDIA_FORMATS.map((format) => (
+                  <button
+                    key={format.id}
+                    onClick={() => toggleFormat(format)}
+                    className={`px-2 py-1.5 text-xs rounded-md border transition-all text-left ${
+                      selectedFormats.find(f => f.id === format.id)
+                        ? 'border-yellow-400 bg-yellow-50 text-gray-900'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs">{format.icon}</span>
+                      <div>
+                        <div className="font-medium leading-none text-[11px]">{format.name}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <div>
-              <h3 className="text-sm font-medium text-gray-900 mb-3">Facebook Ads</h3>
-              <FormatSelectionGrid
-                formats={FACEBOOK_AD_FORMATS}
-                selectedFormats={selectedFormats}
-                onToggleFormat={toggleFormat}
-                category="facebook"
-                getRecommendedFormats={() => []}
-                isFormatRecommended={() => false}
-              />
+            {/* Facebook Ads Section */}
+            <div className="border border-gray-200 rounded-lg">
+              <div className="p-3 bg-gray-50">
+                <h3 className="text-sm font-semibold text-gray-900">Facebook Ads</h3>
+                <p className="text-xs text-gray-600 mt-0.5">{selectedFormats.filter(f => FACEBOOK_AD_FORMATS.includes(f)).length} selected</p>
+              </div>
+              <div className="p-3 grid grid-cols-3 gap-2 max-h-48 overflow-y-auto">
+                {FACEBOOK_AD_FORMATS.map((format) => (
+                  <button
+                    key={format.id}
+                    onClick={() => toggleFormat(format)}
+                    className={`px-2 py-1.5 text-xs rounded-md border transition-all text-left ${
+                      selectedFormats.find(f => f.id === format.id)
+                        ? 'border-yellow-400 bg-yellow-50 text-gray-900'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs">{format.icon}</span>
+                      <div>
+                        <div className="font-medium leading-none text-[11px]">{format.name}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}
@@ -312,7 +360,7 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
               <textarea
                 value={smartInput.instructions || ''}
                 onChange={(e) => onSmartInputChange({ ...smartInput, instructions: e.target.value })}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none"
+                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-400 resize-none leading-relaxed"
                 placeholder="Any specific instructions for the AI..."
                 rows={4}
               />

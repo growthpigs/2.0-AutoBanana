@@ -46,15 +46,19 @@ const EmptyState: React.FC<{ onImageUpload: (file: File, previewUrl: string) => 
   };
 
   return (
-    <div className="flex-1 flex items-center justify-center p-8">
+    <div className="absolute inset-0 flex items-center justify-center p-8">
       <div 
         className="w-full max-w-md text-center border-2 border-dashed border-gray-300 rounded-xl p-8 hover:border-gray-400 transition-colors"
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
         <div className="mb-4">
-          <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-yellow-400 to-pink-500 rounded-full flex items-center justify-center">
-            <span className="text-2xl">🍌</span>
+          <div className="w-16 h-16 mx-auto mb-4 bg-[#F1F600] rounded-full flex items-center justify-center p-2">
+            <img 
+              src="/banana-loading-trimmed.gif" 
+              alt="AutoBanana Loading" 
+              className="w-full h-full object-contain"
+            />
           </div>
         </div>
         
@@ -91,7 +95,7 @@ const CreativeCanvas: React.FC<{
   const [editPrompt, setEditPrompt] = useState('');
 
   return (
-    <div className="flex-1 flex flex-col bg-gray-50">
+    <div className="flex-1 flex flex-col bg-gray-50 relative">
       {/* Canvas Toolbar */}
       <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
         <div className="flex items-center gap-1">
@@ -130,7 +134,7 @@ const CreativeCanvas: React.FC<{
       </div>
 
       {/* Canvas Area */}
-      <div className="flex-1 flex items-center justify-center p-8">
+      <div className="flex-1 flex items-center justify-center p-8 overflow-hidden">
         <div className="relative bg-white rounded-lg shadow-lg overflow-hidden" style={{ maxWidth: '600px', maxHeight: '600px' }}>
           <img
             src={content.imageUrl}
