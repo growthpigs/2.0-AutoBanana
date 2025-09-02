@@ -185,7 +185,7 @@ export const Workspace: React.FC<WorkspaceProps> = (props) => {
           </div>
           
           {/* Persistent Editing Tools - Locked to image container */}
-          <div className="mt-4" style={{ width: `${containerWidth}px` }}>
+          <div className="mt-2.5" style={{ width: `${containerWidth}px` }}>
             <EditingTools 
               {...props} 
               isDisabled={!generatedContent}

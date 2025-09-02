@@ -195,13 +195,13 @@ export const EditingTools: React.FC<EditingToolsProps> = ({
       </div>
 
       {/* Chat Input - Taller */}
-      <form onSubmit={handleAdjustmentSubmit} className="relative px-4 pb-4">
+      <form onSubmit={handleAdjustmentSubmit} className="relative px-4 pb-2">
         <textarea
           value={adjustmentInput}
           onChange={(e) => setAdjustmentInput(e.target.value)}
           placeholder="Describe changes (e.g., 'make it brighter', 'add sunset background', 'change to summer theme')"
           className="w-full px-4 pr-16 py-3 text-base border border-gray-300/80 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-400 resize-none"
-          style={{ backgroundColor: '#fffef9' }}
+          style={{ backgroundColor: '#fafafa' }}
           disabled={disabled}
           rows={2}
           onKeyDown={(e) => {

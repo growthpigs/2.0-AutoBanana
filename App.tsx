@@ -812,7 +812,7 @@ export const App: React.FC = () => {
             <Header />
             
             {/* Unified Banner with Simple Text Labels */}
-            <div className="bg-gray-50 border-b border-gray-200" style={{ height: '140px' }}>
+            <div className="bg-gray-50 border-b border-gray-200" style={{ height: '136px' }}>
                 <div className="flex flex-col h-full">
                     {/* Simple Text Labels - moved up 3px */}
                     <div className="flex items-center pt-1 px-4">
@@ -931,7 +931,7 @@ export const App: React.FC = () => {
                 </div>
             </div>
             
-            <main className="flex-grow flex">
+            <main className="flex-grow flex bg-white">
                 <Sidebar
                     imageLibrary={uploadedImages}
                     generatedGallery={sessionGallery}
