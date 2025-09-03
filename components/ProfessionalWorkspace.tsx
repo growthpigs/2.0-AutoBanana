@@ -17,6 +17,8 @@ interface ProfessionalWorkspaceProps {
   onImageUpload: (file: File, previewUrl: string) => void;
   onImageMerge?: (file: File, previewUrl: string, mergeType: string, customInstructions: string) => void;
   lastGenerationParams?: LastGenerationParams | null;
+  imageLibrary?: any[];
+  onSelectFromLibrary?: (image: any) => void;
 }
 
 const EmptyState: React.FC<{ onImageUpload: (file: File, previewUrl: string) => void }> = ({ onImageUpload }) => {
@@ -115,74 +117,73 @@ const CreativeCanvas: React.FC<{
 
   return (
     <div className="flex-1 flex flex-col bg-gray-50">
-      {/* Canvas Toolbar - Single row with tools and chat inline */}
-      <div className="flex items-center justify-between px-4 bg-white border-b border-gray-200" style={{ height: '58px' }}>
-        <div className="flex items-center gap-1">
-          {/* Editing Tools - Compact */}
-          <button
-            onClick={onNewVariation}
-            disabled={isLoading}
-            className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="New Variation"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Variation</span>
-          </button>
-          
-          <button
-            onClick={onRegenerateText}
-            disabled={isLoading || !lastGenerationParams}
-            className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="New Text"
-          >
-            <Type className="w-3.5 h-3.5" />
-            <span>Text</span>
-          </button>
-          
-          <button
-            onClick={() => setShowMergeModal(true)}
-            disabled={isLoading}
-            className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="Blend Images"
-          >
-            <Image className="w-3.5 h-3.5" />
-            <span>Blend Images</span>
-          </button>
-        </div>
-
-        {/* Chat Input - Inline on the right */}
-        <div className="flex-1 max-w-lg mx-4">
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            if (chatInput.trim() && !isLoading) {
-              onEditPrompt(chatInput);
-              setChatInput('');
-            }
-          }} className="relative">
-            <input
-              type="text"
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              placeholder="Describe changes (e.g., 'make it brighter', 'add sunset background')"
-              className="w-full px-3 pr-10 py-1.5 text-sm border border-gray-300/80 rounded-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-400"
-              style={{ backgroundColor: '#fafafa' }}
-              disabled={isLoading}
-            />
+      {/* Row 2: Global Editing Toolbar - Full width across entire workspace */}
+      <div className="bg-white border-b border-gray-200 px-6 py-3">
+        <div className="flex items-center justify-between">
+          {/* Left: Editing Tools */}
+          <div className="flex items-center gap-4">
             <button
-              type="submit"
-              disabled={isLoading || !chatInput.trim()}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1 text-gray-500 hover:text-yellow-600 disabled:opacity-30 disabled:cursor-not-allowed"
+              onClick={onNewVariation}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              title="New Variation"
             >
-              <Send className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" />
+              <span>Variation</span>
             </button>
-          </form>
-        </div>
+            
+            <button
+              onClick={onRegenerateText}
+              disabled={isLoading || !lastGenerationParams}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              title="New Text"
+            >
+              <Type className="w-4 h-4" />
+              <span>Text</span>
+            </button>
+            
+            <button
+              onClick={() => setShowMergeModal(true)}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              title="Blend Images"
+            >
+              <Image className="w-4 h-4" />
+              <span>Blend Images</span>
+            </button>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800">
-            <Download className="w-4 h-4" />
-            Export
-          </button>
+          {/* Right: Chat Input + Export */}
+          <div className="flex items-center gap-4">
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              if (chatInput.trim() && !isLoading) {
+                onEditPrompt(chatInput);
+                setChatInput('');
+              }
+            }} className="relative">
+              <input
+                type="text"
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                placeholder="Describe changes (e.g., 'make it brighter', 'add sunset background')"
+                className="w-80 px-4 pr-12 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-400"
+                disabled={isLoading}
+              />
+              <button
+                type="submit"
+                disabled={isLoading || !chatInput.trim()}
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 p-1.5 text-gray-500 hover:text-yellow-600 disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </form>
+            
+            <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-gray-800">
+              <Download className="w-4 h-4" />
+              Export
+            </button>
+          </div>
         </div>
       </div>
 
@@ -206,9 +207,9 @@ const CreativeCanvas: React.FC<{
         className="hidden"
       />
 
-      {/* Canvas Area */}
+      {/* Canvas Area - Clean, centered image display */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="relative bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '800px', height: '800px' }}>
+        <div className="relative bg-white rounded-lg shadow-lg overflow-hidden" style={{ maxWidth: '600px', maxHeight: '600px' }}>
           <img
             src={content.imageUrl}
             alt="Generated content"
@@ -238,37 +239,93 @@ const ProjectGallery: React.FC<{
   sessionGallery: GeneratedContent[];
   onSelectFromGallery: (content: GeneratedContent) => void;
   currentContent: GeneratedContent | null;
-}> = ({ sessionGallery, onSelectFromGallery, currentContent }) => {
-  if (sessionGallery.length === 0) return null;
+  imageLibrary?: any[]; // Add imageLibrary prop
+  onSelectFromLibrary?: (image: any) => void; // Add handler
+}> = ({ sessionGallery, onSelectFromGallery, currentContent, imageLibrary = [], onSelectFromLibrary }) => {
+  const [activeTab, setActiveTab] = useState<'generations' | 'uploads'>('generations');
 
   return (
-    <div className="w-64 bg-white border-l border-gray-200 p-4">
-      <h3 className="text-sm font-medium text-gray-900 mb-4">Recent Generations</h3>
-      <div className="space-y-3">
-        {sessionGallery.slice(0, 8).map((item, index) => (
+    <div className="w-80 bg-white border-l border-gray-200 flex flex-col h-full">
+      {/* Tabs */}
+      <div className="border-b border-gray-200">
+        <nav className="flex">
           <button
-            key={index}
-            onClick={() => onSelectFromGallery(item)}
-            className={`w-full aspect-square rounded-lg overflow-hidden border-2 transition-all ${
-              currentContent?.imageUrl === item.imageUrl
-                ? 'border-yellow-400 ring-2 ring-yellow-100'
-                : 'border-gray-200 hover:border-gray-300'
+            onClick={() => setActiveTab('uploads')}
+            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'uploads' 
+                ? 'border-yellow-400 text-gray-900 bg-yellow-50' 
+                : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
             }`}
           >
-            <img
-              src={item.imageUrl}
-              alt={`Generation ${index + 1}`}
-              className="w-full h-full object-cover"
-            />
+            Uploads ({imageLibrary.length})
           </button>
-        ))}
+          <button
+            onClick={() => setActiveTab('generations')}
+            className={`flex-1 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'generations' 
+                ? 'border-yellow-400 text-gray-900 bg-yellow-50' 
+                : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+            }`}
+          >
+            Generations ({sessionGallery.length})
+          </button>
+        </nav>
       </div>
-      
-      {sessionGallery.length > 8 && (
-        <button className="w-full mt-3 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-md hover:bg-gray-50">
-          View All ({sessionGallery.length})
-        </button>
-      )}
+
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-4">
+        {activeTab === 'uploads' && (
+          <div>
+            {imageLibrary.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-8">No uploads yet</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {imageLibrary.map((image, index) => (
+                  <button
+                    key={image.id}
+                    onClick={() => onSelectFromLibrary?.(image)}
+                    className="aspect-square rounded-lg overflow-hidden border-2 border-gray-200 hover:border-gray-300 transition-all"
+                  >
+                    <img
+                      src={image.previewUrl}
+                      alt={image.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {activeTab === 'generations' && (
+          <div>
+            {sessionGallery.length === 0 ? (
+              <p className="text-sm text-gray-500 text-center py-8">No generations yet</p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {sessionGallery.slice(0, 12).map((item, index) => (
+                  <button
+                    key={index}
+                    onClick={() => onSelectFromGallery(item)}
+                    className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
+                      currentContent?.imageUrl === item.imageUrl
+                        ? 'border-yellow-400 ring-2 ring-yellow-100'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <img
+                      src={item.imageUrl}
+                      alt={`Generation ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -285,7 +342,9 @@ export const ProfessionalWorkspace: React.FC<ProfessionalWorkspaceProps> = ({
   onFacebookAdTextChange,
   onImageUpload,
   onImageMerge,
-  lastGenerationParams
+  lastGenerationParams,
+  imageLibrary,
+  onSelectFromLibrary
 }) => {
   if (isLoading) {
     return (
@@ -320,6 +379,8 @@ export const ProfessionalWorkspace: React.FC<ProfessionalWorkspaceProps> = ({
         sessionGallery={sessionGallery}
         onSelectFromGallery={onSelectFromGallery}
         currentContent={content}
+        imageLibrary={imageLibrary}
+        onSelectFromLibrary={onSelectFromLibrary}
       />
     </div>
   );

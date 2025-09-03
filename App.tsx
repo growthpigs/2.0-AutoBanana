@@ -990,6 +990,8 @@ export const App: React.FC = () => {
                         onImageUpload={handleImageUpload}
                         onImageMerge={handleImageMerge}
                         lastGenerationParams={lastGenerationParams}
+                        imageLibrary={uploadedImages}
+                        onSelectFromLibrary={handleSelectFromLibrary}
                     />
                 </main>
             </div>

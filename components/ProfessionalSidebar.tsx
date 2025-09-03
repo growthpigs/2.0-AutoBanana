@@ -222,15 +222,20 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
             </div>
 
             {/* Environment Options */}
-            {hasAnalysis && (
+            {hasAnalysis && selectedImage?.analysis?.naturalEnvironments && (
               <div>
-                <h3 className="text-sm font-medium text-gray-900 mb-3">Environment</h3>
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-sm font-medium text-gray-900">Natural Environments</h3>
+                  <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
+                    {selectedImage.analysis.naturalEnvironments.length} found
+                  </span>
+                </div>
                 <div className="grid grid-cols-2 gap-2">
-                  {(selectedImage?.analysis?.naturalEnvironments || []).slice(0, 6).map((env) => (
+                  {selectedImage.analysis.naturalEnvironments.slice(0, 6).map((env, index) => (
                     <button
-                      key={env}
+                      key={`${env}-${index}`}
                       onClick={() => setSelectedEnvironment(env)}
-                      className={`p-2 text-xs font-medium rounded-md border transition-all ${
+                      className={`p-2 text-xs font-medium rounded-md border transition-all text-left ${
                         selectedEnvironment === env
                           ? 'border-yellow-400 bg-yellow-50 text-gray-900'
                           : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
@@ -240,6 +245,13 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                     </button>
                   ))}
                 </div>
+                {selectedEnvironment && (
+                  <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
+                    <div className="text-xs text-blue-700">
+                      ✨ Selected: <span className="font-medium">{selectedEnvironment}</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
@@ -262,6 +274,32 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Generate Button - positioned under text options */}
+            <div className="mt-6">
+              <button
+                onClick={() => {
+                  if (activeTab === 'setup' && selectedEnvironment) {
+                    onGenerate(selectedEnvironment);
+                  } else if (activeTab === 'blend-pro') {
+                    onGenerate('blend-pro-environment');
+                  } else if (selectedFormats.length > 0) {
+                    onGenerate(selectedFormats);
+                  }
+                }}
+                disabled={!hasImage || isLoading || (activeTab === 'formats' && selectedFormats.length === 0)}
+                className={`w-2/3 mx-auto px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-2 shadow-lg ${
+                  !hasImage || (activeTab === 'formats' && selectedFormats.length === 0)
+                    ? 'bg-white text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
+                    : isLoading
+                    ? 'bg-black text-white border-black'
+                    : 'bg-white text-black border-black hover:bg-black hover:text-white'
+                }`}
+              >
+                <SparklesIcon className="w-4 h-4" />
+                {isLoading ? 'Generating...' : 'Generate'}
+              </button>
             </div>
           </div>
         )}
@@ -302,6 +340,28 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                 getRecommendedFormats={() => []}
                 isFormatRecommended={() => false}
               />
+            </div>
+
+            {/* Generate Button - positioned at bottom of formats tab */}
+            <div className="mt-6">
+              <button
+                onClick={() => {
+                  if (selectedFormats.length > 0) {
+                    onGenerate(selectedFormats);
+                  }
+                }}
+                disabled={!hasImage || isLoading || selectedFormats.length === 0}
+                className={`w-2/3 mx-auto px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-2 shadow-lg ${
+                  !hasImage || selectedFormats.length === 0
+                    ? 'bg-white text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
+                    : isLoading
+                    ? 'bg-black text-white border-black'
+                    : 'bg-white text-black border-black hover:bg-black hover:text-white'
+                }`}
+              >
+                <SparklesIcon className="w-4 h-4" />
+                {isLoading ? 'Generating...' : 'Generate'}
+              </button>
             </div>
           </div>
         )}
@@ -444,36 +504,30 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
                 rows={3}
               />
             </div>
+
+            {/* Generate Button - positioned at bottom of blend-pro tab */}
+            <div className="mt-6">
+              <button
+                onClick={() => {
+                  onGenerate('blend-pro-environment');
+                }}
+                disabled={!hasImage || isLoading}
+                className={`w-2/3 mx-auto px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-2 shadow-lg ${
+                  !hasImage
+                    ? 'bg-white text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
+                    : isLoading
+                    ? 'bg-gradient-to-r from-yellow-500 to-pink-600 text-white border-transparent'
+                    : 'bg-gradient-to-r from-yellow-400 to-pink-500 text-white border-transparent hover:from-yellow-500 hover:to-pink-600'
+                }`}
+              >
+                <SparklesIcon className="w-4 h-4" />
+                {isLoading ? 'Generating...' : 'Generate Pro'}
+              </button>
+            </div>
           </div>
         )}
       </div>
 
-      {/* Floating Generate Button - stays in bottom left corner of sidebar */}
-      <button
-        onClick={() => {
-          if (activeTab === 'setup' && selectedEnvironment) {
-            onGenerate(selectedEnvironment);
-          } else if (activeTab === 'blend-pro') {
-            // For now, use Natural Environment with Blend Pro enhancements
-            onGenerate('blend-pro-environment');
-          } else if (selectedFormats.length > 0) {
-            onGenerate(selectedFormats);
-          }
-        }}
-        disabled={!hasImage || isLoading || (activeTab === 'formats' && selectedFormats.length === 0)}
-        className={`absolute bottom-4 left-4 z-50 px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-2 shadow-lg ${
-          !hasImage || (activeTab === 'formats' && selectedFormats.length === 0)
-            ? 'bg-white text-white border-black cursor-not-allowed opacity-50'
-            : isLoading
-            ? 'bg-black text-white border-black'
-            : activeTab === 'blend-pro'
-            ? 'bg-gradient-to-r from-yellow-400 to-pink-500 text-white border-transparent hover:from-yellow-500 hover:to-pink-600'
-            : 'bg-white text-black border-black hover:bg-black hover:text-white'
-        }`}
-      >
-        <SparklesIcon className="w-4 h-4" />
-        {isLoading ? 'Generating...' : 'Generate'}
-      </button>
     </div>
   );
 };

@@ -2,6 +2,50 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 📝 CHANGELOG PROTOCOL
+
+**MANDATORY DOCUMENTATION RULES:**
+- Create changelog entry every 15 minutes OR every major change
+- Document all layout changes, feature additions, bug fixes  
+- Include before/after state for major UI changes
+- Note any breaking changes or regressions immediately
+- Use clear timestamps and commit references
+
+### 2025-09-03 3:46 PM - MAJOR LAYOUT RESTORATION COMPLETE
+
+**CRITICAL FIX: Complete layout restoration after regression**
+
+**Changes Made:**
+1. **Fixed sidebar and right panel widths**: Changed from w-64 to w-80 for proper proportions
+2. **Added comprehensive Uploads/Generations tabs**: Right panel now has tabbed interface with proper state management
+3. **Restored 2-row header structure**: ProfessionalWorkspace now has proper global editing toolbar as Row 2
+4. **Fixed generate button positioning and styling**: 
+   - Moved from floating bottom-left to underneath text options
+   - Set to two-thirds width (w-2/3) with proper styling
+   - Added black border and "Generate" text
+   - Different styling for Blend Pro (gradient)
+5. **Enhanced natural environments display**: 
+   - Added counter badge showing detected environments
+   - Improved visual feedback with selected environment highlight
+   - Better conditional rendering
+
+**Root Causes Identified:**
+- Right panel was too narrow (w-64 instead of w-80)
+- Duplicate toolbar code causing layout confusion
+- Missing proper tab system for uploads/generations
+
+**Impact:**
+- Restored beautiful 2-row design structure
+- Proper 3-column layout (sidebar + workspace + right panel)
+- Generate button now properly positioned and styled
+- Natural environments working with enhanced visual feedback
+- Layout now matches original design intent
+
+**Files Modified:**
+- `components/ProfessionalWorkspace.tsx` - 2-row header structure, right panel tabs
+- `components/ProfessionalSidebar.tsx` - Generate button repositioning, enhanced environments
+- `CLAUDE.md` - Added changelog protocol
+
 ## Project Overview
 
 Adify is an AI-powered ad generation tool that transforms product images into professional marketing materials using Google's Gemini AI. The application generates ad mockups, social media posts, and Facebook ad content with both visual and text components.
