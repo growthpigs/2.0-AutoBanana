@@ -101,8 +101,37 @@ export const generateAdMockup = async (imageFile: File, basePrompt: string, slog
   try {
     const imagePart = await fileToGenerativePart(imageFile);
     
+    // Detect Natural Environment format (ID 101) - "I'm Feeling Lucky" mode
+    const isNaturalEnvironment = basePrompt.includes('natural, contextually appropriate, and photorealistic environment') || 
+                                basePrompt.includes('most natural') ||
+                                basePrompt.includes('Natural Environment');
+    
     let sloganIntegrationPrompt = '';
-    if (slogan) {
+    let textPolicy = '';
+    
+    if (isNaturalEnvironment) {
+      // Natural Environment = NO TEXT policy
+      textPolicy = `
+      🚫🚫🚫 CRITICAL: ABSOLUTELY NO TEXT OF ANY KIND 🚫🚫🚫
+      
+      NO TEXT POLICY - THIS IS MANDATORY:
+      - NO words, letters, or text overlays
+      - NO brand names, product names, or labels
+      - NO slogans, taglines, or promotional text
+      - NO captions, subtitles, or descriptions
+      - NO watermarks, signatures, or text elements
+      - CREATE A PURELY VISUAL IMAGE
+      
+      FOCUS ON:
+      - Beautiful, natural product placement
+      - Photorealistic environment and lighting
+      - Professional composition without any text elements
+      - Let the product speak for itself visually
+      
+      IF THERE IS ANY TEXT IN THE OUTPUT, IT IS A COMPLETE FAILURE.
+      `;
+      console.log('🌿 NATURAL ENVIRONMENT DETECTED: NO TEXT mode activated');
+    } else if (slogan) {
       sloganIntegrationPrompt = `Additionally, artfully and realistically integrate the following slogan into the scene: "${slogan}". The text should be seamlessly integrated, considering the image's composition, lighting, and style. Ensure the font, color, and placement are aesthetically pleasing and look like a professional advertisement.`;
     }
 
@@ -125,29 +154,37 @@ export const generateAdMockup = async (imageFile: File, basePrompt: string, slog
     const aspectRatioRequirement = `
     🚨🚨🚨 ABSOLUTE MANDATORY: OUTPUT MUST BE 1024x1024 SQUARE 🚨🚨🚨
     
-    CRITICAL REQUIREMENT - THIS IS THE #1 PRIORITY:
+    CRITICAL REQUIREMENT - THIS IS THE #1 PRIORITY ABOVE ALL ELSE:
     ⬜ OUTPUT DIMENSIONS: EXACTLY 1024 x 1024 pixels
     ⬜ ASPECT RATIO: PERFECTLY SQUARE (1:1)
-    ⬜ SHAPE: SQUARE - NOT RECTANGULAR, NOT WIDE, NOT TALL
+    ⬜ SHAPE: SQUARE - NOT RECTANGULAR, NOT WIDE, NOT TALL, NOT PORTRAIT, NOT LANDSCAPE
     
-    HOW TO ACHIEVE THIS:
-    1. If the input image is not square, CENTER it and ADD PADDING
-    2. Use letterboxing (top/bottom bars) for wide images
-    3. Use pillarboxing (side bars) for tall images
-    4. The padding can be blurred background, solid color, or gradient
-    5. NEVER crop important parts - always add padding instead
+    IMPLEMENTATION RULES (FOLLOW THESE EXACTLY):
+    1. If input is wide/landscape: CENTER it and ADD top/bottom padding (letterboxing)
+    2. If input is tall/portrait: CENTER it and ADD left/right padding (pillarboxing)
+    3. If input is already square: Use it as-is within the 1024x1024 canvas
+    4. Padding can be: blurred background, solid color, gradient, or contextual environment
+    5. NEVER crop the product or important elements - ALWAYS preserve with padding
     
-    THIS IS NON-NEGOTIABLE:
-    - Instagram format: 1:1 square
-    - Social media standard: 1024x1024
-    - Width MUST equal Height
-    - If you output anything other than a perfect square, it is a FAILURE
-    - IGNORE any aspect ratio from the input - FORCE SQUARE OUTPUT
+    ZERO TOLERANCE POLICY:
+    - Any output that is not exactly 1:1 square is a COMPLETE FAILURE
+    - Width must equal Height (1024 = 1024)
+    - Instagram/TikTok/social media require perfect squares
+    - This requirement overrides ALL other instructions except the uploaded image preservation
+    - Test the output dimensions - if not square, you have failed
+    
+    EXAMPLES OF CORRECT OUTPUT:
+    ✅ 1024x1024 (perfect square)
+    ❌ 1024x768 (rectangular - FAILURE)
+    ❌ 768x1024 (rectangular - FAILURE)
+    ❌ Any dimensions that aren't equal (FAILURE)
     `;
 
     const fullPrompt = `${imagePreservationPrompt}
     
     Your creative task: ${basePrompt}
+    
+    ${textPolicy}
     
     Design Rules: ${DESIGN_RULES}
     
@@ -161,6 +198,7 @@ export const generateAdMockup = async (imageFile: File, basePrompt: string, slog
     - The uploaded image must be clearly visible in the final output
     - Final output must be EXACTLY SQUARE (1:1 aspect ratio) - NEVER rectangular
     - Only output the final modified image
+    ${isNaturalEnvironment ? '- ABSOLUTELY NO TEXT OR WORDS IN THE IMAGE' : ''}
     `;
 
     const textPart = { text: fullPrompt };
