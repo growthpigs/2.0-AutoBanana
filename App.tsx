@@ -988,6 +988,7 @@ export const App: React.FC = () => {
                         onSelectFromGallery={handleSelectFromGallery}
                         onFacebookAdTextChange={handleFacebookAdTextChange}
                         onImageUpload={handleImageUpload}
+                        onImageMerge={handleImageMerge}
                         lastGenerationParams={lastGenerationParams}
                     />
                 </main>
