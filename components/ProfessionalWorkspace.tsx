@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { GeneratedContent, FacebookAdContent } from '../types';
 import { Download, Share2, Sparkles, Type, Image, Plus, ChevronDown, Send } from 'lucide-react';
 import { LastGenerationParams } from '../App';
-import { ImageMergeModal } from './ImageMergeModal';
 
 interface ProfessionalWorkspaceProps {
   content: GeneratedContent | null;
@@ -15,7 +14,6 @@ interface ProfessionalWorkspaceProps {
   onSelectFromGallery: (content: GeneratedContent) => void;
   onFacebookAdTextChange: (newContent: Partial<FacebookAdContent>) => void;
   onImageUpload: (file: File, previewUrl: string) => void;
-  onImageMerge?: (file: File, previewUrl: string, mergeType: string, customInstructions: string) => void;
   lastGenerationParams?: LastGenerationParams | null;
 }
 
@@ -93,7 +91,6 @@ const CreativeCanvas: React.FC<{
   onRegenerateText?: () => void;
   onNewVariation?: () => void;
   onImageUpload?: (file: File, previewUrl: string) => void;
-  onImageMerge?: (file: File, previewUrl: string, mergeType: string, customInstructions: string) => void;
   lastGenerationParams?: LastGenerationParams | null;
   isLoading?: boolean;
 }> = ({ 
@@ -104,19 +101,17 @@ const CreativeCanvas: React.FC<{
   onRegenerateText,
   onNewVariation,
   onImageUpload,
-  onImageMerge,
   lastGenerationParams,
   isLoading = false
 }) => {
   const [chatInput, setChatInput] = useState('');
-  const [showMergeModal, setShowMergeModal] = useState(false);
-  
+  const [showImageMenu, setShowImageMenu] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="flex-1 flex flex-col bg-gray-50">
       {/* Canvas Toolbar - Single row with tools and chat inline */}
-      <div className="flex items-center justify-between px-4 bg-white border-b border-gray-200" style={{ height: '58px' }}>
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
         <div className="flex items-center gap-1">
           {/* Editing Tools - Compact */}
           <button
@@ -140,14 +135,69 @@ const CreativeCanvas: React.FC<{
           </button>
           
           <button
-            onClick={() => setShowMergeModal(true)}
+            onClick={onRegenerateImage}
             disabled={isLoading}
             className="flex items-center gap-1.5 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-            title="Blend Images"
+            title="New Image"
           >
             <Image className="w-3.5 h-3.5" />
-            <span>Blend Images</span>
+            <span>Image</span>
           </button>
+
+          {/* Add Image Dropdown - Compact */}
+          <div className="relative">
+            <button
+              onClick={() => setShowImageMenu(!showImageMenu)}
+              disabled={isLoading}
+              className="flex items-center gap-1 px-2 py-1.5 text-xs text-gray-600 hover:text-yellow-600 hover:bg-yellow-50 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add</span>
+              <ChevronDown className="w-2.5 h-2.5" />
+            </button>
+            
+            {showImageMenu && (
+              <div className="absolute left-0 top-full mt-1 w-36 bg-white border border-gray-200/80 rounded-lg shadow-lg z-10">
+                <button
+                  onClick={() => {
+                    setShowImageMenu(false);
+                    onEditPrompt('Merge the uploaded image with the current image, blending them naturally');
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                >
+                  Merge Images
+                </button>
+                <button
+                  onClick={() => {
+                    setShowImageMenu(false);
+                    onEditPrompt('Replace the main product with the new uploaded image while keeping the same style');
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                >
+                  Swap Product
+                </button>
+                <button
+                  onClick={() => {
+                    setShowImageMenu(false);
+                    onEditPrompt('Overlay the new image on top of the current image as a layer');
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                >
+                  Overlay Image
+                </button>
+                <div className="border-t border-gray-200/80" />
+                <button
+                  onClick={() => {
+                    setShowImageMenu(false);
+                    fileInputRef.current?.click();
+                  }}
+                  className="w-full text-left px-3 py-2 text-xs text-gray-700 hover:bg-gray-50"
+                >
+                  Upload New
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Chat Input - Inline on the right */}
@@ -179,6 +229,10 @@ const CreativeCanvas: React.FC<{
         </div>
 
         <div className="flex items-center gap-2">
+          <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            <Share2 className="w-4 h-4" />
+            Share
+          </button>
           <button className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800">
             <Download className="w-4 h-4" />
             Export
@@ -208,7 +262,7 @@ const CreativeCanvas: React.FC<{
 
       {/* Canvas Area */}
       <div className="flex-1 flex items-center justify-center p-8">
-        <div className="relative bg-white rounded-lg shadow-lg overflow-hidden" style={{ width: '800px', height: '800px' }}>
+        <div className="relative bg-white rounded-lg shadow-lg overflow-hidden" style={{ maxWidth: '600px', maxHeight: '600px' }}>
           <img
             src={content.imageUrl}
             alt="Generated content"
@@ -216,20 +270,6 @@ const CreativeCanvas: React.FC<{
           />
         </div>
       </div>
-
-      {/* Image Merge Modal */}
-      <ImageMergeModal
-        isOpen={showMergeModal}
-        onClose={() => setShowMergeModal(false)}
-        onMerge={(file, previewUrl, mergeType, customInstructions) => {
-          // Use the new multi-image merge handler instead of text-only approach
-          if (onImageMerge) {
-            onImageMerge(file, previewUrl, mergeType, customInstructions);
-          } else {
-            console.error('onImageMerge handler not available');
-          }
-        }}
-      />
     </div>
   );
 };
@@ -284,7 +324,6 @@ export const ProfessionalWorkspace: React.FC<ProfessionalWorkspaceProps> = ({
   onSelectFromGallery,
   onFacebookAdTextChange,
   onImageUpload,
-  onImageMerge,
   lastGenerationParams
 }) => {
   if (isLoading) {
@@ -312,7 +351,6 @@ export const ProfessionalWorkspace: React.FC<ProfessionalWorkspaceProps> = ({
         onRegenerateText={onRegenerateText}
         onNewVariation={onNewVariation}
         onImageUpload={onImageUpload}
-        onImageMerge={onImageMerge}
         lastGenerationParams={lastGenerationParams}
         isLoading={isLoading}
       />
