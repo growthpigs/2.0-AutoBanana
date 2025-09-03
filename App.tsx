@@ -943,7 +943,7 @@ export const App: React.FC = () => {
     }
     
     return (
-        <div className="flex flex-col min-h-screen bg-white">
+        <div className="flex flex-col bg-white">
             <ProfessionalHeader />
             
             

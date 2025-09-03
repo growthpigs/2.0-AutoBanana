@@ -1,38 +1,10 @@
-# CLAUDE.md - BMAD-Enhanced Configuration
+# CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-This project uses the BMAD (Build-Model-Adapt-Document) methodology with integrated MCPs for quality assurance.
 
 ## Project Overview
 
 Adify is an AI-powered ad generation tool that transforms product images into professional marketing materials using Google's Gemini AI. The application generates ad mockups, social media posts, and Facebook ad content with both visual and text components.
-
-## Active MCPs (Model Context Protocols)
-
-### CodeRabbit MCP
-- **Status**: ✅ Active
-- **Config**: `.claude/mcps/coderabbit-config.json`
-- **Purpose**: AI code review on every commit
-
-### Sourcegraph AMP (formerly Cody)
-- **Status**: ✅ Active  
-- **Config**: `.claude/mcps/sourcegraph-amp-config.json`
-- **Purpose**: Code intelligence and refactoring
-
-### TestSprite MCP
-- **Status**: ✅ Active
-- **Config**: `test-docs/testsprite-config.json`
-- **Purpose**: AI test generation (80% coverage target)
-
-## Git Workflow (Graphite)
-
-We use Graphite for stacked PRs:
-```bash
-gt status          # Check status
-gt commit -m ""    # Commit
-gt submit         # Submit for review
-gt stack update   # Sync with main
-```
 
 ## Development Commands
 
@@ -40,30 +12,33 @@ gt stack update   # Sync with main
 # Install dependencies
 npm install
 
-# Run development server
+# Run development server (runs on port 3000)
 npm run dev
 
 # Build for production
 npm run build
 
-# Testing with TestSprite
-npm test
-npm run test:coverage
-npm run test:e2e
+# Preview production build
+npm run preview
 
-# Code quality
-npm run lint
+# Type checking
 npm run typecheck
+
+# Manual testing (displays test checklist)
+npm run test:manual
+
+# Test build (typecheck + build)
+npm run test:build
 ```
 
 ## Environment Setup
 
 Create a `.env.local` file with your Gemini API key:
 ```
-GEMINI_API_KEY=your_api_key_here
+VITE_GEMINI_API_KEY=your_api_key_here
 ```
 
-The API key is accessed via `process.env.API_KEY` in the code (configured through Vite).
+The API key is accessed via `import.meta.env.VITE_GEMINI_API_KEY` in the code (Vite environment variable format).
 
 ## Architecture & Key Components
 
@@ -117,10 +92,12 @@ Comprehensive error handling throughout:
 
 ## Testing Approach
 
-While no formal test suite exists, the app includes:
+The app uses manual testing approach with:
+- `TEST_CHECKLIST.md` file containing manual testing procedures
 - Default product image for immediate testing without uploads
 - Error boundaries and comprehensive error messages
 - Loading state management for all async operations
+- Use `npm run test:manual` to view the test checklist
 
 ## Common Development Tasks
 
@@ -138,3 +115,50 @@ All AI prompts and interactions are in `services/geminiService.ts`. Key function
 
 ### Updating Design Rules
 Modify the `DESIGN_RULES` constant in `constants.ts` to change global image generation constraints.
+
+## File Structure
+
+The project follows a flat structure optimized for rapid development:
+
+```
+/
+├── App.tsx                 # Main application component and state management
+├── constants.ts           # Ad formats, design rules, and configuration
+├── types.ts               # TypeScript type definitions
+├── index.tsx             # Application entry point
+├── /components/          # React components
+│   ├── ProfessionalSidebar.tsx    # Main sidebar with format selection
+│   ├── ProfessionalWorkspace.tsx  # Main workspace and editing tools
+│   ├── ProfessionalHeader.tsx     # Application header
+│   ├── SmartProductInput.tsx      # AI analysis input component
+│   └── ...                        # Other UI components
+├── /services/
+│   ├── geminiService.ts          # All Gemini AI interactions
+│   └── mockIntelligence.ts       # Smart analysis utilities
+└── /src/                 # Vite assets
+    └── index.css         # Global styles
+```
+
+## Key Technical Details
+
+### Environment Variables
+- Uses Vite's environment variable system (`VITE_` prefix)
+- API key must be set in `.env.local` as `VITE_GEMINI_API_KEY`
+- Accessed via `import.meta.env.VITE_GEMINI_API_KEY`
+
+### Build System
+- Vite-based build system with React and TypeScript
+- Port configuration: dev server on 3000, HMR on 3001
+- Path alias: `@` resolves to project root
+
+### AI Service Architecture
+- Singleton pattern for Gemini AI instance in `geminiService.ts`
+- All AI operations centralized in one service file
+- Base64 image handling for AI processing
+- Comprehensive error handling for API failures
+
+### Smart Analysis System
+- Automatic product analysis on image upload
+- Industry and audience detection
+- Natural environment recommendations
+- Stored analysis results with uploaded images

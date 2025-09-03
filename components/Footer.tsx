@@ -17,7 +17,7 @@ const AutoBananaLogotype: React.FC<{ className?: string }> = ({ className = "h-6
 );
 
 export const Footer: React.FC = () => (
-  <footer className="mt-auto" style={{ backgroundColor: '#6b7280' }}>
+  <footer style={{ backgroundColor: '#6b7280', marginTop: '400px' }}>
     <div className="py-6" style={{ paddingLeft: '20px', paddingRight: '20px' }}>
       <div className="flex justify-between items-center">
         {/* Left side - Subtle logo - matching About/Privacy text color */}

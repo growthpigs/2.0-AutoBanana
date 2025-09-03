@@ -79,7 +79,7 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
   };
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full">
+    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full relative">
       {/* Professional Tabs */}
       <div className="border-b border-gray-200">
         <nav className="flex">
@@ -339,23 +339,27 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
         )}
       </div>
 
-      {/* Generate Button */}
-      <div className="p-4 border-t border-gray-200">
-        <button
-          onClick={() => {
-            if (activeTab === 'setup' && selectedEnvironment) {
-              onGenerate(selectedEnvironment);
-            } else if (selectedFormats.length > 0) {
-              onGenerate(selectedFormats);
-            }
-          }}
-          disabled={!hasImage || isLoading || (activeTab !== 'setup' && selectedFormats.length === 0)}
-          className="w-full px-4 py-2.5 text-sm font-semibold text-white bg-gray-900 hover:bg-gray-800 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
-        >
-          <SparklesIcon className="w-4 h-4" />
-          Generate
-        </button>
-      </div>
+      {/* Floating Generate Button - stays in bottom left corner of sidebar */}
+      <button
+        onClick={() => {
+          if (activeTab === 'setup' && selectedEnvironment) {
+            onGenerate(selectedEnvironment);
+          } else if (selectedFormats.length > 0) {
+            onGenerate(selectedFormats);
+          }
+        }}
+        disabled={!hasImage || isLoading || (activeTab !== 'setup' && selectedFormats.length === 0)}
+        className={`absolute bottom-4 left-4 z-50 px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-2 shadow-lg ${
+          !hasImage || (activeTab !== 'setup' && selectedFormats.length === 0)
+            ? 'bg-white text-white border-black cursor-not-allowed opacity-50'
+            : isLoading
+            ? 'bg-black text-white border-black'
+            : 'bg-white text-white border-black hover:bg-black hover:text-white'
+        }`}
+      >
+        <SparklesIcon className="w-4 h-4" />
+        {isLoading ? 'Generating...' : 'Generate'}
+      </button>
     </div>
   );
 };
