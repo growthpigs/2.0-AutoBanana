@@ -1074,6 +1074,38 @@ export const App: React.FC = () => {
                     },
                 }}
             />
+
+            {/* Floating Generate Button - fixed at bottom-left corner of screen */}
+            {selectedImage && (
+                <button
+                    onClick={() => {
+                        // Smart defaults: use first available option if none selected
+                        if (selectedImage?.analysis?.naturalEnvironments?.length > 0) {
+                            const environment = selectedImage.analysis.naturalEnvironments[0];
+                            handleGenerate(environment);
+                        } else {
+                            handleGenerate();
+                        }
+                    }}
+                    disabled={isLoading || isAnalyzing}
+                    className={`fixed bottom-6 left-6 z-[99999] px-8 py-4 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-4 shadow-2xl emergency-button-2025-09-03 ${
+                        isLoading || isAnalyzing
+                            ? 'bg-red-600 text-white border-red-800 cursor-wait'
+                            : 'bg-red-500 text-white border-red-700 hover:bg-red-600 cursor-pointer'
+                    }`}
+                >
+                    <div className="w-4 h-4">
+                        {isLoading || isAnalyzing ? (
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        )}
+                    </div>
+                    {isLoading || isAnalyzing ? 'Generating...' : 'Generate'}
+                </button>
+            )}
         </div>
     );
 };

@@ -79,7 +79,7 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
   };
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col h-full relative">
+    <div className="w-[500px] bg-white border-r-2 border-gray-300 flex flex-col min-h-screen relative cache-bust-2025-09-03">
       {/* Professional Tabs */}
       <div className="border-b border-gray-200">
         <nav className="flex">
@@ -160,6 +160,40 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
               </div>
             </div>
 
+            {/* Environment Options */}
+            {hasAnalysis && selectedImage?.analysis?.naturalEnvironments && (
+              <div className="border border-yellow-200 rounded-lg p-4 bg-yellow-50">
+                <div className="flex items-center gap-2 mb-3">
+                  <h3 className="text-sm font-medium text-gray-900">Natural Environments</h3>
+                  <span className="text-xs bg-yellow-200 text-yellow-800 px-2 py-0.5 rounded-full">
+                    {selectedImage.analysis.naturalEnvironments.length} found
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {selectedImage.analysis.naturalEnvironments.slice(0, 6).map((env, index) => (
+                    <button
+                      key={`${env}-${index}`}
+                      onClick={() => setSelectedEnvironment(env)}
+                      className={`p-2 text-xs font-medium rounded-md border transition-all text-left ${
+                        selectedEnvironment === env
+                          ? 'border-yellow-400 bg-yellow-200 text-gray-900'
+                          : 'border-yellow-300 bg-white text-gray-700 hover:border-yellow-400 hover:bg-yellow-100'
+                      }`}
+                    >
+                      {env}
+                    </button>
+                  ))}
+                </div>
+                {selectedEnvironment && (
+                  <div className="mt-2 p-2 bg-yellow-100 border border-yellow-300 rounded-md">
+                    <div className="text-xs text-yellow-800">
+                      ✨ Selected: <span className="font-medium">{selectedEnvironment}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Product Information */}
             <div>
               <h3 className="text-sm font-medium text-gray-900 mb-3">Product Information</h3>
@@ -221,40 +255,6 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
               </div>
             </div>
 
-            {/* Environment Options */}
-            {hasAnalysis && selectedImage?.analysis?.naturalEnvironments && (
-              <div>
-                <div className="flex items-center gap-2 mb-3">
-                  <h3 className="text-sm font-medium text-gray-900">Natural Environments</h3>
-                  <span className="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">
-                    {selectedImage.analysis.naturalEnvironments.length} found
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {selectedImage.analysis.naturalEnvironments.slice(0, 6).map((env, index) => (
-                    <button
-                      key={`${env}-${index}`}
-                      onClick={() => setSelectedEnvironment(env)}
-                      className={`p-2 text-xs font-medium rounded-md border transition-all text-left ${
-                        selectedEnvironment === env
-                          ? 'border-yellow-400 bg-yellow-50 text-gray-900'
-                          : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
-                      }`}
-                    >
-                      {env}
-                    </button>
-                  ))}
-                </div>
-                {selectedEnvironment && (
-                  <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-md">
-                    <div className="text-xs text-blue-700">
-                      ✨ Selected: <span className="font-medium">{selectedEnvironment}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
             {/* Text Options */}
             <div>
               <h3 className="text-sm font-medium text-gray-900 mb-3">Text Style (Optional)</h3>
@@ -276,31 +276,6 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
               </div>
             </div>
 
-            {/* Generate Button - positioned under text options */}
-            <div className="mt-6">
-              <button
-                onClick={() => {
-                  if (activeTab === 'setup' && selectedEnvironment) {
-                    onGenerate(selectedEnvironment);
-                  } else if (activeTab === 'blend-pro') {
-                    onGenerate('blend-pro-environment');
-                  } else if (selectedFormats.length > 0) {
-                    onGenerate(selectedFormats);
-                  }
-                }}
-                disabled={!hasImage || isLoading || (activeTab === 'formats' && selectedFormats.length === 0)}
-                className={`w-2/3 mx-auto px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-2 shadow-lg ${
-                  !hasImage || (activeTab === 'formats' && selectedFormats.length === 0)
-                    ? 'bg-white text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
-                    : isLoading
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-black border-black hover:bg-black hover:text-white'
-                }`}
-              >
-                <SparklesIcon className="w-4 h-4" />
-                {isLoading ? 'Generating...' : 'Generate'}
-              </button>
-            </div>
           </div>
         )}
 
@@ -342,27 +317,6 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
               />
             </div>
 
-            {/* Generate Button - positioned at bottom of formats tab */}
-            <div className="mt-6">
-              <button
-                onClick={() => {
-                  if (selectedFormats.length > 0) {
-                    onGenerate(selectedFormats);
-                  }
-                }}
-                disabled={!hasImage || isLoading || selectedFormats.length === 0}
-                className={`w-2/3 mx-auto px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-2 shadow-lg ${
-                  !hasImage || selectedFormats.length === 0
-                    ? 'bg-white text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
-                    : isLoading
-                    ? 'bg-black text-white border-black'
-                    : 'bg-white text-black border-black hover:bg-black hover:text-white'
-                }`}
-              >
-                <SparklesIcon className="w-4 h-4" />
-                {isLoading ? 'Generating...' : 'Generate'}
-              </button>
-            </div>
           </div>
         )}
 
@@ -505,25 +459,6 @@ export const ProfessionalSidebar: React.FC<ProfessionalSidebarProps> = ({
               />
             </div>
 
-            {/* Generate Button - positioned at bottom of blend-pro tab */}
-            <div className="mt-6">
-              <button
-                onClick={() => {
-                  onGenerate('blend-pro-environment');
-                }}
-                disabled={!hasImage || isLoading}
-                className={`w-2/3 mx-auto px-6 py-3 text-sm font-semibold rounded-lg transition-all duration-200 flex items-center justify-center gap-2 border-2 shadow-lg ${
-                  !hasImage
-                    ? 'bg-white text-gray-400 border-gray-300 cursor-not-allowed opacity-50'
-                    : isLoading
-                    ? 'bg-gradient-to-r from-yellow-500 to-pink-600 text-white border-transparent'
-                    : 'bg-gradient-to-r from-yellow-400 to-pink-500 text-white border-transparent hover:from-yellow-500 hover:to-pink-600'
-                }`}
-              >
-                <SparklesIcon className="w-4 h-4" />
-                {isLoading ? 'Generating...' : 'Generate Pro'}
-              </button>
-            </div>
           </div>
         )}
       </div>
