@@ -20,6 +20,7 @@ interface EditingToolsProps {
   onNewVariation: () => void;
   lastGenerationParams: LastGenerationParams | null;
   isDisabled?: boolean;
+  containerWidth?: number;
 }
 
 export const EditingTools: React.FC<EditingToolsProps> = ({

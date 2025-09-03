@@ -55,7 +55,11 @@ const InitialState: React.FC<{ onImageUpload: (file: File, previewUrl: string) =
       }
     `;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    return () => {
+      if (document.head.contains(style)) {
+        document.head.removeChild(style);
+      }
+    };
   }, []);
 
   const handleFile = (file: File | undefined) => {

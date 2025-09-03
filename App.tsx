@@ -10,6 +10,7 @@ import { ProfessionalHeader } from './components/ProfessionalHeader';
 import { Footer } from './components/Footer';
 import { ProfessionalSidebar } from './components/ProfessionalSidebar';
 import { ProfessionalWorkspace } from './components/ProfessionalWorkspace';
+import { GlobalToolbar } from './components/GlobalToolbar';
 import { AnalysisCompleteNotification } from './components/AnalysisCompleteNotification';
 import { PlusIcon } from './components/Icons';
 import { AnalysisLoader } from './components/AnalysisLoader';
@@ -946,6 +947,19 @@ export const App: React.FC = () => {
         <div className="flex flex-col bg-white">
             <ProfessionalHeader />
             
+            {/* Global Toolbar - Full Width */}
+            <GlobalToolbar
+                isLoading={loadingState !== 'idle'}
+                onNewVariation={handleNewVariation}
+                onRegenerateText={handleRegenerateText}
+                onRegenerateImage={handleRegenerateImage}
+                onEditPrompt={handleEdit}
+                onImageUpload={handleImageUpload}
+                uploadsCount={uploadedImages.length}
+                generationsCount={sessionGallery.length}
+                sessionGallery={sessionGallery}
+                onSelectFromGallery={handleSelectFromGallery}
+            />
             
             <div className="flex-grow flex">
                 {/* Professional sidebar */}
